@@ -572,7 +572,430 @@ function formatOrder(order: any): OrderInfo {
   };
 }
 
+// ============================================================================
+// COPY TRADING FUNCTIONS
+// ============================================================================
+
+/**
+ * Top trader info for copy trading
+ */
+export interface TopTraderInfo {
+  traderId: string;
+  walletAddress: string;
+  displayName?: string;
+  avatar?: string;
+  totalPnl: number;
+  totalPnlPercent: number;
+  winRate: number;
+  totalTrades: number;
+  avgLeverage: number;
+  followers: number;
+  copiers: number;
+  aum: number; // Assets Under Management
+  ranking: number;
+  isVerified: boolean;
+  joinedAt: string;
+  performance: {
+    day7: number;
+    day30: number;
+    day90: number;
+    allTime: number;
+  };
+}
+
+/**
+ * Copy trade settings
+ */
+export interface CopyTradeSettings {
+  followerId: string;
+  traderId: string;
+  walletAddress: string;
+  isActive: boolean;
+  copyRatio: number; // 0.1 = 10%, 1 = 100%, 2 = 200%
+  maxPositionSize: string;
+  maxLeverage: number;
+  copyLongs: boolean;
+  copyShorts: boolean;
+  stopLossPercent?: number;
+  takeProfitPercent?: number;
+  excludedSymbols: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Copy trade result
+ */
+export interface CopyTradeResult {
+  success: boolean;
+  settings?: CopyTradeSettings;
+  error?: string;
+}
+
+/**
+ * Get top traders for copy trading
+ */
+export async function getTopTraders(
+  limit: number = 20,
+  sortBy: 'pnl' | 'winRate' | 'followers' | 'aum' = 'pnl',
+  timeframe: '7d' | '30d' | '90d' | 'all' = '30d'
+): Promise<TopTraderInfo[]> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.getTopTraders({
+      limit,
+      sortBy,
+      timeframe,
+    });
+
+    if (!response || response.error) {
+      return [];
+    }
+
+    const traders: TopTraderInfo[] = [];
+    const tradersArray = Array.isArray(response) ? response : [];
+
+    for (const trader of tradersArray) {
+      traders.push(formatTraderInfo(trader));
+    }
+
+    return traders;
+  } catch (error) {
+    throw new Error(`Failed to get top traders: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Get trader details
+ */
+export async function getTraderDetails(traderId: string): Promise<TopTraderInfo | null> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.getTraderDetails(traderId);
+
+    if (!response || response.error) {
+      return null;
+    }
+
+    return formatTraderInfo(response);
+  } catch (error) {
+    throw new Error(`Failed to get trader details: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Get trader's recent trades/positions
+ */
+export async function getTraderPositions(
+  traderId: string,
+  limit: number = 20
+): Promise<PositionInfo[]> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.getTraderPositions(traderId, limit);
+
+    if (!response || response.error) {
+      return [];
+    }
+
+    const positions: PositionInfo[] = [];
+    const positionsArray = Array.isArray(response) ? response : [];
+
+    for (const position of positionsArray) {
+      positions.push(formatPosition(position));
+    }
+
+    return positions;
+  } catch (error) {
+    throw new Error(`Failed to get trader positions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Follow a trader (start copy trading)
+ */
+export async function followTrader(
+  traderId: string,
+  walletAddress: string,
+  settings: Partial<CopyTradeSettings> = {}
+): Promise<CopyTradeResult> {
+  try {
+    const sdk = await getSDK();
+
+    const copySettings = {
+      traderId,
+      walletAddress,
+      copyRatio: settings.copyRatio || 1.0,
+      maxPositionSize: settings.maxPositionSize || '1000',
+      maxLeverage: settings.maxLeverage || 10,
+      copyLongs: settings.copyLongs !== false,
+      copyShorts: settings.copyShorts !== false,
+      stopLossPercent: settings.stopLossPercent,
+      takeProfitPercent: settings.takeProfitPercent,
+      excludedSymbols: settings.excludedSymbols || [],
+    };
+
+    const response = await sdk.copyTrade.followTrader(copySettings);
+
+    if (!response || response.error) {
+      return {
+        success: false,
+        error: response?.error || 'Failed to follow trader',
+      };
+    }
+
+    return {
+      success: true,
+      settings: {
+        followerId: response.followerId || '',
+        traderId,
+        walletAddress,
+        isActive: true,
+        copyRatio: copySettings.copyRatio,
+        maxPositionSize: copySettings.maxPositionSize,
+        maxLeverage: copySettings.maxLeverage,
+        copyLongs: copySettings.copyLongs,
+        copyShorts: copySettings.copyShorts,
+        stopLossPercent: copySettings.stopLossPercent,
+        takeProfitPercent: copySettings.takeProfitPercent,
+        excludedSymbols: copySettings.excludedSymbols,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Unfollow a trader (stop copy trading)
+ */
+export async function unfollowTrader(
+  traderId: string,
+  walletAddress: string,
+  closePositions: boolean = false
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.unfollowTrader({
+      traderId,
+      walletAddress,
+      closePositions,
+    });
+
+    if (!response || response.error) {
+      return {
+        success: false,
+        error: response?.error || 'Failed to unfollow trader',
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Update copy trade settings
+ */
+export async function updateCopySettings(
+  traderId: string,
+  walletAddress: string,
+  settings: Partial<CopyTradeSettings>
+): Promise<CopyTradeResult> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.updateSettings({
+      traderId,
+      walletAddress,
+      ...settings,
+    });
+
+    if (!response || response.error) {
+      return {
+        success: false,
+        error: response?.error || 'Failed to update settings',
+      };
+    }
+
+    return {
+      success: true,
+      settings: response.settings,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Get traders being followed
+ */
+export async function getFollowedTraders(walletAddress: string): Promise<{
+  trader: TopTraderInfo;
+  settings: CopyTradeSettings;
+}[]> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.getFollowedTraders(walletAddress);
+
+    if (!response || response.error) {
+      return [];
+    }
+
+    const followed: { trader: TopTraderInfo; settings: CopyTradeSettings }[] = [];
+    const followedArray = Array.isArray(response) ? response : [];
+
+    for (const item of followedArray) {
+      followed.push({
+        trader: formatTraderInfo(item.trader),
+        settings: item.settings,
+      });
+    }
+
+    return followed;
+  } catch (error) {
+    throw new Error(`Failed to get followed traders: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Get copy trading history
+ */
+export async function getCopyTradeHistory(
+  walletAddress: string,
+  limit: number = 50
+): Promise<{
+  positionId: string;
+  traderId: string;
+  traderName: string;
+  symbol: string;
+  side: PositionSide;
+  size: string;
+  entryPrice: number;
+  exitPrice?: number;
+  pnl: number;
+  pnlPercent: number;
+  status: PositionStatus;
+  copiedAt: string;
+  closedAt?: string;
+}[]> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.getHistory(walletAddress, limit);
+
+    if (!response || response.error) {
+      return [];
+    }
+
+    const history: any[] = [];
+    const historyArray = Array.isArray(response) ? response : [];
+
+    for (const item of historyArray) {
+      history.push({
+        positionId: item.positionId || '',
+        traderId: item.traderId || '',
+        traderName: item.traderName || 'Unknown',
+        symbol: item.symbol || '',
+        side: item.side || 'long',
+        size: item.size || '0',
+        entryPrice: item.entryPrice || 0,
+        exitPrice: item.exitPrice,
+        pnl: item.pnl || 0,
+        pnlPercent: item.pnlPercent || 0,
+        status: item.status || 'closed',
+        copiedAt: item.copiedAt || new Date().toISOString(),
+        closedAt: item.closedAt,
+      });
+    }
+
+    return history;
+  } catch (error) {
+    throw new Error(`Failed to get copy trade history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Pause/resume copy trading for a trader
+ */
+export async function toggleCopyTrading(
+  traderId: string,
+  walletAddress: string,
+  isActive: boolean
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const sdk = await getSDK();
+
+    const response = await sdk.copyTrade.toggleActive({
+      traderId,
+      walletAddress,
+      isActive,
+    });
+
+    if (!response || response.error) {
+      return {
+        success: false,
+        error: response?.error || 'Failed to toggle copy trading',
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Format trader info from API response
+ */
+function formatTraderInfo(trader: any): TopTraderInfo {
+  return {
+    traderId: trader.traderId || trader.id || '',
+    walletAddress: trader.walletAddress || trader.address || '',
+    displayName: trader.displayName || trader.name,
+    avatar: trader.avatar,
+    totalPnl: trader.totalPnl || 0,
+    totalPnlPercent: trader.totalPnlPercent || 0,
+    winRate: trader.winRate || 0,
+    totalTrades: trader.totalTrades || 0,
+    avgLeverage: trader.avgLeverage || 1,
+    followers: trader.followers || 0,
+    copiers: trader.copiers || 0,
+    aum: trader.aum || 0,
+    ranking: trader.ranking || 0,
+    isVerified: trader.isVerified || false,
+    joinedAt: trader.joinedAt || new Date().toISOString(),
+    performance: {
+      day7: trader.performance?.day7 || trader.pnl7d || 0,
+      day30: trader.performance?.day30 || trader.pnl30d || 0,
+      day90: trader.performance?.day90 || trader.pnl90d || 0,
+      allTime: trader.performance?.allTime || trader.totalPnl || 0,
+    },
+  };
+}
+
 export default {
+  // Leverage trading
   getMarkets,
   getMarketInfo,
   openPosition,
@@ -584,4 +1007,14 @@ export default {
   modifyLeverage,
   setStopLossTakeProfit,
   getAccountInfo,
+  // Copy trading
+  getTopTraders,
+  getTraderDetails,
+  getTraderPositions,
+  followTrader,
+  unfollowTrader,
+  updateCopySettings,
+  getFollowedTraders,
+  getCopyTradeHistory,
+  toggleCopyTrading,
 };

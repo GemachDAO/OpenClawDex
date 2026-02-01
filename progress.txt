@@ -94,10 +94,13 @@ TASKS
     - COMPLETED: Full Hyperliquid integration with markets, positions, orders, account info.
       Features: open/close positions, modify leverage, set SL/TP, cancel orders.
 
-[ ] Task 10: Implement Hyperliquid copy trading
+[x] Task 10: Implement Hyperliquid copy trading
     - Add to hyperliquid.service.ts: getTopTraders(), followTrader(), unfollowTrader()
     - Create apps/api/src/routes/copy.ts
     - Files: apps/api/src/services/hyperliquid.service.ts, apps/api/src/routes/copy.ts
+    - COMPLETED: Added copy trading to hyperliquid service with getTopTraders, getTraderDetails,
+      getTraderPositions, followTrader, unfollowTrader, updateCopySettings, toggleCopyTrading,
+      getCopyTradeHistory. Full REST API for copy trading operations.
 
 --------------------------------------------------------------------------------
 

@@ -15,6 +15,7 @@ import quoteRoutes from './routes/quote.js';
 import swapRoutes from './routes/swap.js';
 import memecoinsRoutes from './routes/memecoins.js';
 import leverageRoutes from './routes/leverage.js';
+import copyRoutes from './routes/copy.js';
 
 // Verify Gdex SDK is available
 let gdexAvailable = false;
@@ -70,6 +71,7 @@ app.use('/api/quote', quoteRoutes);
 app.use('/api/swap', swapRoutes);
 app.use('/api/memecoins', memecoinsRoutes);
 app.use('/api/leverage', leverageRoutes);
+app.use('/api/copy', copyRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
