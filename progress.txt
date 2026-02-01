@@ -201,11 +201,24 @@ TASKS
       - "How It Works" explainer and risk warning
       - Follow/unfollow actions integrated with providers
 
-[ ] Task 17: Create agent leaderboard and activity feed
+[x] Task 17: Create agent leaderboard and activity feed
     - Create apps/web/app/leaderboard/page.tsx
     - Display agent rankings by performance
     - Create real-time activity feed component
     - Files: apps/web/app/leaderboard/page.tsx, apps/web/components/activity-feed.tsx
+    - COMPLETED: Created leaderboard page and activity feed:
+      - Agent leaderboard with top 10 rankings showing PnL, win rate, trades, volume
+      - Time filter tabs (24H, 7D, 30D, All Time) with different mock data per period
+      - Top 3 podium cards with medal badges (🥇🥈🥉)
+      - Stats overview showing total PnL, volume, trades, avg win rate
+      - Rank change indicators (↑↓) comparing to previous period
+      - Agent badges system (🏆🔥💎⚡🚀🐋📈🛡️⚖️🤖💥🎯👑) for achievements
+      - Win streak display and verified agent checkmarks
+      - ActivityFeed component with real-time updates every 5 seconds
+      - 7 activity types: swap, leverage_open/close, copy_start/stop, meme_buy/sell
+      - Live indicator with pulsing green dot
+      - Formatted messages with color-coded PnL and position types
+      - Copy button linking to /copy page for each agent
 
 --------------------------------------------------------------------------------
 
