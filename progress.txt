@@ -21,11 +21,12 @@ TASKS
     - Files: package.json, tsconfig.json, apps/api/package.json, apps/web/package.json
     - COMPLETED: 2026-02-01 - Monorepo structure with npm workspaces, Express API scaffold, Next.js frontend with Tailwind
 
-[ ] Task 2: Install gdex.pro-sdk and backend dependencies
+[x] Task 2: Install gdex.pro-sdk and backend dependencies
     - cd apps/api && npm install gdex.pro-sdk ethers axios express ws
     - npm install -D typescript @types/node @types/express
     - Create apps/api/src/index.ts entry point
     - Files: apps/api/package.json, apps/api/src/index.ts
+    - COMPLETED: 2026-02-01 - Installed SDK + deps, created config module, verified SDK loads
 
 [ ] Task 3: Install @json-render/core, @json-render/react, Next.js
     - cd apps/web && npx create-next-app@latest . --typescript --tailwind
@@ -190,6 +191,12 @@ COMPLETED
     - Created Express API server scaffold
     - Created Next.js frontend with Tailwind CSS
     - Added .gitignore
+
+[x] Task 2: Install gdex.pro-sdk and backend dependencies (2026-02-01)
+    - Installed gdex.pro-sdk v1.1.6, ethers, axios, express, cors, ws, dotenv
+    - Created apps/api/src/config/index.ts for env config
+    - Created .env.example with all configuration options
+    - Server verified: SDK loads successfully
 
 ================================================================================
 NOTES
