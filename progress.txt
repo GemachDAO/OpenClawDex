@@ -122,7 +122,7 @@ TASKS
         followTrader, unfollowTrader, navigate, etc.
       - Validation functions for amounts, addresses, slippage, leverage
 
-[ ] Task 12: Build component registry (Card, Metric, Chart, Table, etc.)
+[x] Task 12: Build component registry (Card, Metric, Chart, Table, etc.)
     - Create apps/web/components/ui/card.tsx
     - Create apps/web/components/ui/metric.tsx
     - Create apps/web/components/ui/chart.tsx
@@ -132,6 +132,15 @@ TASKS
     - Create apps/web/components/ui/activity-item.tsx
     - Create apps/web/components/registry.ts
     - Files: apps/web/components/ui/*.tsx, apps/web/components/registry.ts
+    - COMPLETED: Full component registry with 14 React components:
+      - Layout: Card (variants, padding), Grid (responsive columns), Stack (flex layout)
+      - Data: Metric (with sparkline), Chart (SVG line/area/bar), Table (sorting, pagination)
+      - UI: Badge, Alert (variants, dismissible)
+      - Trading: TradeForm (swap/buy/sell), PositionCard (leverage positions), TokenCard (meme coins)
+      - Copy Trading: CopyTraderCard (trader profiles with follow/unfollow)
+      - Activity: ActivityItem (transaction history)
+      - Wallet: WalletConnect (connect/disconnect, chain switch)
+      All components typed with catalog schemas and support onAction callbacks.
 
 [ ] Task 13: Set up DataProvider and ActionProvider
     - Create apps/web/lib/providers.tsx
