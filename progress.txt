@@ -310,10 +310,16 @@ TASKS
         - GET /api/referral/tiers - Tier info
         - GET /api/referral/leaderboard - Top referrers
 
-[ ] Task 22: Implement cross-platform referral sharing
+[x] Task 22: Implement cross-platform referral sharing
     - Add shareToMoltbook(), shareToOtherPlatforms() to referral.service.ts
     - Support multiple agent platforms
     - Files: apps/api/src/services/referral.service.ts
+    - COMPLETED: Already implemented in Task 21:
+      - shareToMoltbook() posts referral link to m/openclaw with formatted message
+      - generateShareMessage() creates platform-specific messages
+      - shareToOtherPlatforms() generates messages for Twitter, Discord, Telegram
+      - Twitter includes share URL for one-click posting
+      - Routes: POST /api/referral/share/moltbook, POST /api/referral/share/generate
 
 [ ] Task 23: Create agent onboarding documentation
     - Create docs/ONBOARDING.md - Getting started guide
