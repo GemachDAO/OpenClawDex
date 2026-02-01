@@ -77,11 +77,14 @@ TASKS
 
 ## Phase 3: Trading Features
 
-[ ] Task 8: Integrate Pump.fun meme coin trading (buy/sell)
+[x] Task 8: Integrate Pump.fun meme coin trading (buy/sell)
     - Create apps/api/src/services/pumpfun.service.ts
     - Implement listMemeCoins(), getTokenInfo(), buyToken(), sellToken()
     - Create apps/api/src/routes/memecoins.ts
     - Files: apps/api/src/services/pumpfun.service.ts, apps/api/src/routes/memecoins.ts
+    - COMPLETED: Full Pump.fun integration with listMemeCoins, getTokenInfo, searchMemeCoins,
+      buyToken, sellToken, getBondingCurveInfo, getNewLaunches, getGraduatedTokens.
+      REST endpoints for all meme coin operations.
 
 [ ] Task 9: Implement Hyperliquid leverage trading
     - Create apps/api/src/services/hyperliquid.service.ts
