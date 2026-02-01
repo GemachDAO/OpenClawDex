@@ -613,9 +613,43 @@ export function OpenClawDexProvider({ children }: OpenClawDexProviderProps) {
 }
 
 // ============================================================================
-// Hooks
+// Typed Hooks
 // ============================================================================
 
+/**
+ * Typed hook to access the application data state.
+ * This wraps the generic useData hook with proper AppData typing.
+ */
+export function useAppData(): AppData {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = useData();
+  return data as unknown as AppData;
+}
+
+/**
+ * Action type for OpenClawDex actions
+ */
+export interface OpenClawAction {
+  type: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Typed hook to execute actions with proper type inference.
+ * This wraps the generic useActions hook.
+ */
+export function useAppActions() {
+  const actions = useActions();
+  
+  const execute = (action: OpenClawAction) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (actions as any).execute(action);
+  };
+  
+  return { execute };
+}
+
+// Re-export base hooks for advanced use cases
 export { useData, useActions, useVisibility };
 
 export default OpenClawDexProvider;

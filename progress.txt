@@ -170,11 +170,21 @@ TASKS
       overview with positions list, recent activity feed, copy trading sidebar showing followed
       traders, AI Agent status card with API info, responsive layout, connect wallet flow.
 
-[ ] Task 15: Create trading interface (swap, meme coins, leverage)
+[x] Task 15: Create trading interface (swap, meme coins, leverage)
     - Create apps/web/app/trade/page.tsx
     - Implement swap form, meme coin browser, leverage controls
     - Connect to backend API
     - Files: apps/web/app/trade/page.tsx, apps/web/app/trade/layout.tsx
+    - COMPLETED: Created comprehensive trading page with three tabs:
+      - Swap Tab: Token selector, amount input, slippage control, rate display, price impact
+      - Meme Coins Tab: Trending tokens table (BONK, WIF, POPCAT, MEW, PNUT), search filter,
+        buy/sell panel with SOL amount presets, contract address display
+      - Leverage Tab: Perpetual markets table (BTC, ETH, SOL, ARB, DOGE), order form with
+        long/short toggle, market/limit orders, leverage slider (1-50x), TP/SL inputs,
+        position size and liquidation price calculator
+      - Added typed hooks (useAppData, useAppActions) to providers.tsx for better DX
+      - Added json-render.d.ts type declarations
+      - Updated dashboard to use new typed hooks
 
 [ ] Task 16: Create copy trading interface
     - Create apps/web/app/copy/page.tsx

@@ -7,8 +7,8 @@
 
 'use client';
 
-import { useData, useActions } from '@/lib/providers';
-import type { AppData, TradeHistory, Position, FollowedTrader } from '@/lib/providers';
+import { useAppData, useAppActions } from '@/lib/providers';
+import type { TradeHistory, Position, FollowedTrader } from '@/lib/providers';
 import Link from 'next/link';
 
 // ============================================================================
@@ -243,8 +243,8 @@ function QuickActions() {
 // ============================================================================
 
 export default function Home() {
-  const data = useData() as AppData;
-  const { execute } = useActions();
+  const data = useAppData();
+  const { execute } = useAppActions();
   
   const { wallet, portfolio, trades, copyTrading } = data;
   
