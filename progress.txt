@@ -186,11 +186,20 @@ TASKS
       - Added json-render.d.ts type declarations
       - Updated dashboard to use new typed hooks
 
-[ ] Task 16: Create copy trading interface
+[x] Task 16: Create copy trading interface
     - Create apps/web/app/copy/page.tsx
     - Display top traders list with stats
     - Implement follow/unfollow functionality
     - Files: apps/web/app/copy/page.tsx
+    - COMPLETED: Created comprehensive copy trading page with:
+      - Top traders grid showing PnL, win rate, Sharpe ratio, max drawdown
+      - Trader cards with verified badges, trading style tags, preferred markets
+      - 7D/30D performance display and risk level indicators
+      - Copy settings modal (copy ratio, max position, max leverage, long/short toggles)
+      - Sidebar with active copies list and total PnL
+      - Search, sort (PnL/win rate/copiers/Sharpe), and filter by trading style
+      - "How It Works" explainer and risk warning
+      - Follow/unfollow actions integrated with providers
 
 [ ] Task 17: Create agent leaderboard and activity feed
     - Create apps/web/app/leaderboard/page.tsx
