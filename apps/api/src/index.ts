@@ -17,6 +17,7 @@ import memecoinsRoutes from './routes/memecoins.js';
 import leverageRoutes from './routes/leverage.js';
 import copyRoutes from './routes/copy.js';
 import socialRoutes from './routes/social.js';
+import referralRoutes from './routes/referral.js';
 
 // Verify Gdex SDK is available
 let gdexAvailable = false;
@@ -74,6 +75,7 @@ app.use('/api/memecoins', memecoinsRoutes);
 app.use('/api/leverage', leverageRoutes);
 app.use('/api/copy', copyRoutes);
 app.use('/api/social', socialRoutes);
+app.use('/api/referral', referralRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

@@ -284,11 +284,31 @@ TASKS
 
 ## Phase 7: Referral & Launch
 
-[ ] Task 21: Generate unique referral links for agents
+[x] Task 21: Generate unique referral links for agents
     - Create apps/api/src/services/referral.service.ts
     - Implement generateReferralLink(agentId), trackReferral()
     - Create apps/api/src/routes/referral.ts
     - Files: apps/api/src/services/referral.service.ts, apps/api/src/routes/referral.ts
+    - COMPLETED: Created referral service and routes:
+      - referral.service.ts with full referral system:
+        - generateReferralLink() with custom codes, expiry, max uses
+        - trackReferral() for new signups
+        - activateReferral() when agent makes first trade
+        - recordReferralVolume() for commission tracking
+        - 5-tier system (bronze→diamond) with increasing commissions (10-30%)
+        - shareToMoltbook() and generateShareMessage() for sharing
+        - getReferralLeaderboard() for top referrers
+      - referral.ts routes:
+        - POST /api/referral/link - Create referral link
+        - GET/DELETE /api/referral/link/:code - Manage links
+        - GET /api/referral/validate/:code - Validate codes
+        - POST /api/referral/track - Track referrals
+        - GET /api/referral/stats - Agent stats
+        - GET /api/referral/referrals - List referrals
+        - POST /api/referral/share/moltbook - Share to Moltbook
+        - POST /api/referral/share/generate - Generate share messages
+        - GET /api/referral/tiers - Tier info
+        - GET /api/referral/leaderboard - Top referrers
 
 [ ] Task 22: Implement cross-platform referral sharing
     - Add shareToMoltbook(), shareToOtherPlatforms() to referral.service.ts
