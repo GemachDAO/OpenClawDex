@@ -106,11 +106,21 @@ TASKS
 
 ## Phase 4: Frontend Setup
 
-[ ] Task 11: Create json-render component catalog with Zod schemas
+[x] Task 11: Create json-render component catalog with Zod schemas
     - Create apps/web/lib/catalog.ts
     - Define schemas for: Card, Metric, Chart, Table, TradeForm, CopyTraderCard, ActivityItem, Badge
     - Export catalog for AI generation
     - Files: apps/web/lib/catalog.ts
+    - COMPLETED: Full component catalog with Zod v4 schemas for:
+      - Layout: Card, Grid, Stack, TabsContainer
+      - Data Display: Metric, Chart (line/area/bar/candlestick), Table, Badge, Alert
+      - Trading: TradeForm, LeverageForm, PositionCard, TokenCard
+      - Copy Trading: CopyTraderCard
+      - Activity: ActivityItem
+      - Wallet: WalletConnect
+      - Actions: connectWallet, executeSwap, buyToken, sellToken, openPosition, closePosition,
+        followTrader, unfollowTrader, navigate, etc.
+      - Validation functions for amounts, addresses, slippage, leverage
 
 [ ] Task 12: Build component registry (Card, Metric, Chart, Table, etc.)
     - Create apps/web/components/ui/card.tsx
