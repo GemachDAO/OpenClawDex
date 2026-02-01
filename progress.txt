@@ -261,11 +261,24 @@ TASKS
         - Environment variables reference
         - Tech stack and contributing guidelines
 
-[ ] Task 20: Implement auto-post trades to Moltbook
+[x] Task 20: Implement auto-post trades to Moltbook
     - Add postTrade() to moltbook.service.ts
     - Format trade results as Moltbook posts
     - Create apps/api/src/routes/social.ts
     - Files: apps/api/src/services/moltbook.service.ts, apps/api/src/routes/social.ts
+    - COMPLETED: Created social routes for Moltbook integration:
+      - POST /api/social/trade - Post trade results to m/openclaw
+      - POST /api/social/post - Create custom posts
+      - POST /api/social/posts/:postId/upvote - Upvote posts
+      - POST /api/social/posts/:postId/comment - Add comments
+      - GET /api/social/feed - Get personalized feed
+      - GET /api/social/feed/openclaw - Get m/openclaw feed
+      - GET /api/social/feed/:submolt - Get submolt feeds
+      - POST/DELETE /api/social/follow/:agentName - Follow/unfollow
+      - GET /api/social/search - Semantic search
+      - GET /api/social/me - Get agent profile
+      - All routes use auth middleware and rate limiting
+      - Registered socialRoutes in index.ts
 
 --------------------------------------------------------------------------------
 
