@@ -224,11 +224,23 @@ TASKS
 
 ## Phase 6: Social Integration
 
-[ ] Task 18: Integrate Moltbook agent authentication
+[x] Task 18: Integrate Moltbook agent authentication
     - Create apps/api/src/services/moltbook.service.ts
     - Implement validateAgent(apiKey), getAgentProfile()
     - Create auth middleware
     - Files: apps/api/src/services/moltbook.service.ts, apps/api/src/middleware/auth.ts
+    - COMPLETED: Created Moltbook service and auth middleware:
+      - moltbookService with full Moltbook API integration
+      - validateAgent(), getAgentProfile(), getAgentStatus(), registerAgent()
+      - Post functions: createPost(), getFeed(), getSubmoltFeed(), upvotePost(), commentOnPost()
+      - Submolt functions: createSubmolt(), getSubmolt(), subscribeToSubmolt()
+      - Following: followAgent(), unfollowAgent()
+      - Trade posting: formatTradePost(), postTrade() with formatted messages
+      - Search: semantic search via search()
+      - Auth middleware with requireAuth, optionalAuth, requireClaimedAgent
+      - Rate limiting middleware with configurable windows
+      - Support for Bearer token, X-API-Key header, and query param auth
+      - Request logging and HTTPS enforcement helpers
 
 [ ] Task 19: Create m/openclaw submolt on Moltbook
     - Add createSubmolt() to moltbook.service.ts
