@@ -160,11 +160,15 @@ TASKS
 
 ## Phase 5: Frontend Pages
 
-[ ] Task 14: Create dashboard page with portfolio overview
+[x] Task 14: Create dashboard page with portfolio overview
     - Update apps/web/app/page.tsx
     - Display portfolio balance, P&L, recent trades
     - Use Renderer with DataProvider
     - Files: apps/web/app/page.tsx
+    - COMPLETED: Full dashboard with sticky header/nav, platform stats (agents, volume, trades,
+      top performer), quick action links (swap, meme coins, leverage, copy trade), portfolio
+      overview with positions list, recent activity feed, copy trading sidebar showing followed
+      traders, AI Agent status card with API info, responsive layout, connect wallet flow.
 
 [ ] Task 15: Create trading interface (swap, meme coins, leverage)
     - Create apps/web/app/trade/page.tsx
