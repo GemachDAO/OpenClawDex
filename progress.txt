@@ -1,0 +1,214 @@
+# OpenClawDex Development Progress
+
+## How to Use
+1. Read PRD.md for full context
+2. Find the next incomplete task ([ ])
+3. Implement it
+4. Commit your changes
+5. Mark task complete ([x]) and add notes
+6. Repeat
+
+================================================================================
+TASKS
+================================================================================
+
+## Phase 1: Project Setup
+
+[ ] Task 1: Initialize monorepo with TypeScript (apps/api, apps/web)
+    - Create folder structure: apps/api/, apps/web/
+    - Set up root package.json with workspaces
+    - Configure TypeScript for both apps
+    - Files: package.json, tsconfig.json, apps/api/package.json, apps/web/package.json
+
+[ ] Task 2: Install gdex.pro-sdk and backend dependencies
+    - cd apps/api && npm install gdex.pro-sdk ethers axios express ws
+    - npm install -D typescript @types/node @types/express
+    - Create apps/api/src/index.ts entry point
+    - Files: apps/api/package.json, apps/api/src/index.ts
+
+[ ] Task 3: Install @json-render/core, @json-render/react, Next.js
+    - cd apps/web && npx create-next-app@latest . --typescript --tailwind
+    - npm install @json-render/core @json-render/react zod
+    - Verify json-render imports work
+    - Files: apps/web/package.json, apps/web/app/page.tsx
+
+--------------------------------------------------------------------------------
+
+## Phase 2: Backend Core Services
+
+[ ] Task 4: Implement wallet creation service using Gdex SDK
+    - Create apps/api/src/services/wallet.service.ts
+    - Implement createWallet(), getBalance(), getWalletInfo()
+    - Create apps/api/src/routes/wallet.ts
+    - Files: apps/api/src/services/wallet.service.ts, apps/api/src/routes/wallet.ts
+
+[ ] Task 5: Build quote fetching service for token prices
+    - Create apps/api/src/services/quote.service.ts
+    - Implement getQuote(fromToken, toToken, amount, chain)
+    - Create apps/api/src/routes/quote.ts
+    - Files: apps/api/src/services/quote.service.ts, apps/api/src/routes/quote.ts
+
+[ ] Task 6: Build swap execution service
+    - Create apps/api/src/services/swap.service.ts
+    - Implement executeSwap(quote, walletAddress, slippage)
+    - Create apps/api/src/routes/swap.ts
+    - Files: apps/api/src/services/swap.service.ts, apps/api/src/routes/swap.ts
+
+[ ] Task 7: Add multi-chain support (Solana, Hyperliquid)
+    - Create apps/api/src/config/chains.ts
+    - Configure Solana RPC endpoints
+    - Configure Hyperliquid connection
+    - Files: apps/api/src/config/chains.ts, apps/api/src/config/index.ts
+
+--------------------------------------------------------------------------------
+
+## Phase 3: Trading Features
+
+[ ] Task 8: Integrate Pump.fun meme coin trading (buy/sell)
+    - Create apps/api/src/services/pumpfun.service.ts
+    - Implement listMemeCoins(), getTokenInfo(), buyToken(), sellToken()
+    - Create apps/api/src/routes/memecoins.ts
+    - Files: apps/api/src/services/pumpfun.service.ts, apps/api/src/routes/memecoins.ts
+
+[ ] Task 9: Implement Hyperliquid leverage trading
+    - Create apps/api/src/services/hyperliquid.service.ts
+    - Implement openPosition(), closePosition(), getPositions()
+    - Create apps/api/src/routes/leverage.ts
+    - Files: apps/api/src/services/hyperliquid.service.ts, apps/api/src/routes/leverage.ts
+
+[ ] Task 10: Implement Hyperliquid copy trading
+    - Add to hyperliquid.service.ts: getTopTraders(), followTrader(), unfollowTrader()
+    - Create apps/api/src/routes/copy.ts
+    - Files: apps/api/src/services/hyperliquid.service.ts, apps/api/src/routes/copy.ts
+
+--------------------------------------------------------------------------------
+
+## Phase 4: Frontend Setup
+
+[ ] Task 11: Create json-render component catalog with Zod schemas
+    - Create apps/web/lib/catalog.ts
+    - Define schemas for: Card, Metric, Chart, Table, TradeForm, CopyTraderCard, ActivityItem, Badge
+    - Export catalog for AI generation
+    - Files: apps/web/lib/catalog.ts
+
+[ ] Task 12: Build component registry (Card, Metric, Chart, Table, etc.)
+    - Create apps/web/components/ui/card.tsx
+    - Create apps/web/components/ui/metric.tsx
+    - Create apps/web/components/ui/chart.tsx
+    - Create apps/web/components/ui/table.tsx
+    - Create apps/web/components/ui/trade-form.tsx
+    - Create apps/web/components/ui/copy-trader-card.tsx
+    - Create apps/web/components/ui/activity-item.tsx
+    - Create apps/web/components/registry.ts
+    - Files: apps/web/components/ui/*.tsx, apps/web/components/registry.ts
+
+[ ] Task 13: Set up DataProvider and ActionProvider
+    - Create apps/web/lib/providers.tsx
+    - Configure initial data structure for portfolio, trades, etc.
+    - Set up action handlers for trading operations
+    - Files: apps/web/lib/providers.tsx, apps/web/app/layout.tsx
+
+--------------------------------------------------------------------------------
+
+## Phase 5: Frontend Pages
+
+[ ] Task 14: Create dashboard page with portfolio overview
+    - Update apps/web/app/page.tsx
+    - Display portfolio balance, P&L, recent trades
+    - Use Renderer with DataProvider
+    - Files: apps/web/app/page.tsx
+
+[ ] Task 15: Create trading interface (swap, meme coins, leverage)
+    - Create apps/web/app/trade/page.tsx
+    - Implement swap form, meme coin browser, leverage controls
+    - Connect to backend API
+    - Files: apps/web/app/trade/page.tsx, apps/web/app/trade/layout.tsx
+
+[ ] Task 16: Create copy trading interface
+    - Create apps/web/app/copy/page.tsx
+    - Display top traders list with stats
+    - Implement follow/unfollow functionality
+    - Files: apps/web/app/copy/page.tsx
+
+[ ] Task 17: Create agent leaderboard and activity feed
+    - Create apps/web/app/leaderboard/page.tsx
+    - Display agent rankings by performance
+    - Create real-time activity feed component
+    - Files: apps/web/app/leaderboard/page.tsx, apps/web/components/activity-feed.tsx
+
+--------------------------------------------------------------------------------
+
+## Phase 6: Social Integration
+
+[ ] Task 18: Integrate Moltbook agent authentication
+    - Create apps/api/src/services/moltbook.service.ts
+    - Implement validateAgent(apiKey), getAgentProfile()
+    - Create auth middleware
+    - Files: apps/api/src/services/moltbook.service.ts, apps/api/src/middleware/auth.ts
+
+[ ] Task 19: Create m/openclaw submolt on Moltbook
+    - Add createSubmolt() to moltbook.service.ts
+    - Execute one-time submolt creation
+    - Document in README
+    - Files: apps/api/src/services/moltbook.service.ts, README.md
+
+[ ] Task 20: Implement auto-post trades to Moltbook
+    - Add postTrade() to moltbook.service.ts
+    - Format trade results as Moltbook posts
+    - Create apps/api/src/routes/social.ts
+    - Files: apps/api/src/services/moltbook.service.ts, apps/api/src/routes/social.ts
+
+--------------------------------------------------------------------------------
+
+## Phase 7: Referral & Launch
+
+[ ] Task 21: Generate unique referral links for agents
+    - Create apps/api/src/services/referral.service.ts
+    - Implement generateReferralLink(agentId), trackReferral()
+    - Create apps/api/src/routes/referral.ts
+    - Files: apps/api/src/services/referral.service.ts, apps/api/src/routes/referral.ts
+
+[ ] Task 22: Implement cross-platform referral sharing
+    - Add shareToMoltbook(), shareToOtherPlatforms() to referral.service.ts
+    - Support multiple agent platforms
+    - Files: apps/api/src/services/referral.service.ts
+
+[ ] Task 23: Create agent onboarding documentation
+    - Create docs/ONBOARDING.md - Getting started guide
+    - Create docs/API.md - Full API reference
+    - Update README.md with project overview
+    - Files: docs/ONBOARDING.md, docs/API.md, README.md
+
+================================================================================
+COMPLETED
+================================================================================
+
+(None yet - ready to start!)
+
+================================================================================
+NOTES
+================================================================================
+
+SDK & Libraries:
+- gdex.pro-sdk v1.1.6 - Trading SDK
+- @json-render/core - UI catalog & schemas
+- @json-render/react - React renderer, hooks, providers
+
+Moltbook API:
+- Base URL: https://www.moltbook.com/api/v1
+- Always use www.moltbook.com (not moltbook.com)
+- Auth: Authorization: Bearer API_KEY
+- Rate limits: 100 req/min, 1 post/30min
+
+Chains:
+- Solana (Pump.fun meme coins)
+- Hyperliquid (leverage + copy trading)
+
+Fees:
+- Auto-deducted from transactions via SDK
+- No separate fee structure needed
+
+json-render Resources:
+- Docs: https://github.com/vercel-labs/json-render
+- Install: npm install @json-render/core @json-render/react
+- Requires: react ^19.0.0, zod ^4.0.0

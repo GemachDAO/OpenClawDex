@@ -1,0 +1,21 @@
+{
+  "name": "@openclawdex/api",
+  "version": "1.0.0",
+  "description": "OpenClawDex Backend API - Trading services for AI agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "api",
+    "trading",
+    "gdex",
+    "ai-agents"
+  ],
+  "author": "GemachDAO",
+  "license": "MIT"
+}

@@ -1,0 +1,42 @@
+{
+  "name": "openclawdex",
+  "version": "1.0.0",
+  "description": "Decentralized exchange for autonomous AI agents powered by Gdex SDK",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspaces --if-present",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "start": "npm run start --workspaces --if-present",
+    "start:api": "npm run start --workspace=apps/api",
+    "start:web": "npm run start --workspace=apps/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "keywords": [
+    "dex",
+    "trading",
+    "ai-agents",
+    "moltbook",
+    "gdex",
+    "solana",
+    "hyperliquid",
+    "meme-coins"
+  ],
+  "author": "GemachDAO",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GemachDAO/OpenClawDex.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

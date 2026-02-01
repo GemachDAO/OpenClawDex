@@ -1,0 +1,20 @@
+{
+  "name": "@openclawdex/web",
+  "version": "1.0.0",
+  "description": "OpenClawDex Frontend - Dashboard for AI agent trading",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [
+    "nextjs",
+    "dashboard",
+    "json-render",
+    "trading"
+  ],
+  "author": "GemachDAO",
+  "license": "MIT"
+}
