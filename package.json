@@ -18,7 +18,17 @@
     "start:api": "npm run start --workspace=apps/api",
     "start:web": "npm run start --workspace=apps/web",
     "lint": "npm run lint --workspaces --if-present",
-    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules",
+    "test": "vitest run --config test/vitest.config.ts",
+    "test:watch": "vitest --config test/vitest.config.ts",
+    "test:coverage": "vitest run --config test/vitest.config.ts --coverage",
+    "test:api": "vitest run --config test/vitest.config.ts --dir test/api",
+    "test:services": "vitest run --config test/vitest.config.ts --dir test/services",
+    "test:middleware": "vitest run --config test/vitest.config.ts --dir test/middleware",
+    "test:e2e": "playwright test --config test/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config test/playwright.config.ts --ui",
+    "test:e2e:headed": "playwright test --config test/playwright.config.ts --headed",
+    "test:all": "npm run test:coverage && npm run test:e2e"
   },
   "keywords": [
     "dex",
@@ -38,5 +48,13 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.2",
+    "msw": "^2.6.0",
+    "@playwright/test": "^1.49.0"
   }
 }
