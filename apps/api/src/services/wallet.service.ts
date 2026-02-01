@@ -85,7 +85,9 @@ export async function createWallet(withMnemonic: boolean = true): Promise<Wallet
       };
     } else {
       // Create wallet with just private key
-      const wallet = new Wallet(randomBytes(32));
+      const privateKeyBytes = randomBytes(32);
+      const privateKeyHex = '0x' + Buffer.from(privateKeyBytes).toString('hex');
+      const wallet = new Wallet(privateKeyHex);
       return {
         address: wallet.address,
         privateKey: wallet.privateKey,

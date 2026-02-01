@@ -48,11 +48,13 @@ TASKS
       Gdex SDK integration for balance/holdings, REST endpoints for create/import/balance/validate/chains.
       Fixed CommonJS/ESM compatibility with dynamic import pattern.
 
-[ ] Task 5: Build quote fetching service for token prices
+[x] Task 5: Build quote fetching service for token prices
     - Create apps/api/src/services/quote.service.ts
     - Implement getQuote(fromToken, toToken, amount, chain)
     - Create apps/api/src/routes/quote.ts
     - Files: apps/api/src/services/quote.service.ts, apps/api/src/routes/quote.ts
+    - COMPLETED: Created quote service with getQuote(), getTokenPrice(), getTokenPrices(),
+      searchTokens(), getTrendingTokens(). REST endpoints for quote, price, prices, search, trending.
 
 [ ] Task 6: Build swap execution service
     - Create apps/api/src/services/swap.service.ts

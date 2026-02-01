@@ -11,6 +11,7 @@ import { config } from './config/index.js';
 
 // Import routes
 import walletRoutes from './routes/wallet.js';
+import quoteRoutes from './routes/quote.js';
 
 // Verify Gdex SDK is available
 let gdexAvailable = false;
@@ -62,6 +63,7 @@ app.get('/api', (_req: Request, res: Response) => {
 
 // Register routes
 app.use('/api/wallet', walletRoutes);
+app.use('/api/quote', quoteRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
