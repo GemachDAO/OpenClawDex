@@ -142,11 +142,19 @@ TASKS
       - Wallet: WalletConnect (connect/disconnect, chain switch)
       All components typed with catalog schemas and support onAction callbacks.
 
-[ ] Task 13: Set up DataProvider and ActionProvider
+[x] Task 13: Set up DataProvider and ActionProvider
     - Create apps/web/lib/providers.tsx
     - Configure initial data structure for portfolio, trades, etc.
     - Set up action handlers for trading operations
     - Files: apps/web/lib/providers.tsx, apps/web/app/layout.tsx
+    - COMPLETED: Full provider setup with:
+      - AppData types: Wallet, Portfolio, Positions, TradeHistory, CopyTrading, UI state
+      - Action handlers for: wallet (connect/disconnect/switch), trading (swap/buy/sell),
+        leverage (open/close/modify positions), copy trading (follow/unfollow/settings),
+        navigation (pages, tx explorer), UI (toast, loading, refresh)
+      - API client with error handling
+      - Toast notifications and loading overlay
+      - JSONUIProvider wrapper with registry, data model, and auth state
 
 --------------------------------------------------------------------------------
 
