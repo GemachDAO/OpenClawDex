@@ -14,11 +14,12 @@ TASKS
 
 ## Phase 1: Project Setup
 
-[ ] Task 1: Initialize monorepo with TypeScript (apps/api, apps/web)
+[x] Task 1: Initialize monorepo with TypeScript (apps/api, apps/web)
     - Create folder structure: apps/api/, apps/web/
     - Set up root package.json with workspaces
     - Configure TypeScript for both apps
     - Files: package.json, tsconfig.json, apps/api/package.json, apps/web/package.json
+    - COMPLETED: 2026-02-01 - Monorepo structure with npm workspaces, Express API scaffold, Next.js frontend with Tailwind
 
 [ ] Task 2: Install gdex.pro-sdk and backend dependencies
     - cd apps/api && npm install gdex.pro-sdk ethers axios express ws
@@ -183,7 +184,12 @@ TASKS
 COMPLETED
 ================================================================================
 
-(None yet - ready to start!)
+[x] Task 1: Initialize monorepo with TypeScript (2026-02-01)
+    - Created root package.json with npm workspaces
+    - Set up TypeScript configs for api and web
+    - Created Express API server scaffold
+    - Created Next.js frontend with Tailwind CSS
+    - Added .gitignore
 
 ================================================================================
 NOTES
