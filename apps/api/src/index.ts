@@ -7,12 +7,22 @@
 
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import { config } from './config/index.js';
+
+// Verify Gdex SDK is available
+let gdexAvailable = false;
+try {
+  // Dynamic import to check SDK availability
+  await import('gdex.pro-sdk');
+  gdexAvailable = true;
+} catch (e) {
+  console.warn('Warning: gdex.pro-sdk not fully loaded, some features may be limited');
+}
 
 const app: Express = express();
-const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());
 
 // Health check
@@ -21,7 +31,8 @@ app.get('/health', (_req: Request, res: Response) => {
     status: 'ok', 
     service: 'OpenClawDex API',
     version: '1.0.0',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    sdkStatus: gdexAvailable ? 'loaded' : 'unavailable'
   });
 });
 
@@ -65,7 +76,7 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(config.port, () => {
   console.log(`
   ╔═══════════════════════════════════════════════════════════╗
   ║                                                           ║
@@ -74,7 +85,9 @@ app.listen(PORT, () => {
   ║   Trading DEX for AI Agents                               ║
   ║   Powered by Gdex SDK                                     ║
   ║                                                           ║
-  ║   Server running on http://localhost:${PORT}                ║
+  ║   Server running on http://localhost:${config.port}                ║
+  ║   Environment: ${config.nodeEnv.padEnd(40)}║
+  ║   SDK Status: ${gdexAvailable ? '✓ Loaded' : '✗ Unavailable'}                                  ║
   ║                                                           ║
   ╚═══════════════════════════════════════════════════════════╝
   `);
