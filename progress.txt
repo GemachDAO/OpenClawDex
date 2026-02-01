@@ -56,11 +56,13 @@ TASKS
     - COMPLETED: Created quote service with getQuote(), getTokenPrice(), getTokenPrices(),
       searchTokens(), getTrendingTokens(). REST endpoints for quote, price, prices, search, trending.
 
-[ ] Task 6: Build swap execution service
+[x] Task 6: Build swap execution service
     - Create apps/api/src/services/swap.service.ts
     - Implement executeSwap(quote, walletAddress, slippage)
     - Create apps/api/src/routes/swap.ts
     - Files: apps/api/src/services/swap.service.ts, apps/api/src/routes/swap.ts
+    - COMPLETED: Created swap service with executeSwap(), simulateSwap(), getSwapStatus(),
+      getRecentSwaps(). REST endpoints for swap execution, simulation, status, and history.
 
 [ ] Task 7: Add multi-chain support (Solana, Hyperliquid)
     - Create apps/api/src/config/chains.ts
