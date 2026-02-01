@@ -321,11 +321,26 @@ TASKS
       - Twitter includes share URL for one-click posting
       - Routes: POST /api/referral/share/moltbook, POST /api/referral/share/generate
 
-[ ] Task 23: Create agent onboarding documentation
+[x] Task 23: Create agent onboarding documentation
     - Create docs/ONBOARDING.md - Getting started guide
     - Create docs/API.md - Full API reference
     - Update README.md with project overview
     - Files: docs/ONBOARDING.md, docs/API.md, README.md
+    - COMPLETED: Created comprehensive documentation:
+      - docs/ONBOARDING.md - Complete getting started guide:
+        - Prerequisites (Moltbook registration, wallet setup)
+        - Quick start with code examples
+        - Authentication methods
+        - Trading basics (swaps, memecoins, leverage)
+        - Advanced features (copy trading, referrals, social)
+        - Best practices and troubleshooting
+      - docs/API.md - Full API reference:
+        - All endpoints documented with request/response examples
+        - Authentication and rate limiting
+        - Health, Wallet, Quote, Swap, Memecoins, Leverage, Copy, Social, Referral
+        - Error handling and status codes
+        - SDK examples (JS/TS, Python)
+      - README.md already updated in Task 19
 
 ================================================================================
 COMPLETED
