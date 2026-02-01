@@ -86,11 +86,13 @@ TASKS
       buyToken, sellToken, getBondingCurveInfo, getNewLaunches, getGraduatedTokens.
       REST endpoints for all meme coin operations.
 
-[ ] Task 9: Implement Hyperliquid leverage trading
+[x] Task 9: Implement Hyperliquid leverage trading
     - Create apps/api/src/services/hyperliquid.service.ts
     - Implement openPosition(), closePosition(), getPositions()
     - Create apps/api/src/routes/leverage.ts
     - Files: apps/api/src/services/hyperliquid.service.ts, apps/api/src/routes/leverage.ts
+    - COMPLETED: Full Hyperliquid integration with markets, positions, orders, account info.
+      Features: open/close positions, modify leverage, set SL/TP, cancel orders.
 
 [ ] Task 10: Implement Hyperliquid copy trading
     - Add to hyperliquid.service.ts: getTopTraders(), followTrader(), unfollowTrader()

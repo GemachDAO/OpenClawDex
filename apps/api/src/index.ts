@@ -14,6 +14,7 @@ import walletRoutes from './routes/wallet.js';
 import quoteRoutes from './routes/quote.js';
 import swapRoutes from './routes/swap.js';
 import memecoinsRoutes from './routes/memecoins.js';
+import leverageRoutes from './routes/leverage.js';
 
 // Verify Gdex SDK is available
 let gdexAvailable = false;
@@ -68,6 +69,7 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/quote', quoteRoutes);
 app.use('/api/swap', swapRoutes);
 app.use('/api/memecoins', memecoinsRoutes);
+app.use('/api/leverage', leverageRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
