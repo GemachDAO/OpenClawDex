@@ -9,6 +9,9 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+// Re-export chain configuration
+export * from './chains.js';
+
 export const config = {
   // Server
   port: parseInt(process.env.PORT || '3001', 10),
@@ -27,13 +30,24 @@ export const config = {
   // Solana
   solana: {
     rpcUrl: process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+    devnetRpcUrl: process.env.SOLANA_DEVNET_RPC_URL || 'https://api.devnet.solana.com',
     network: process.env.SOLANA_NETWORK || 'mainnet-beta',
   },
 
   // Hyperliquid
   hyperliquid: {
     apiUrl: process.env.HYPERLIQUID_API_URL || 'https://api.hyperliquid.xyz',
+    testnetApiUrl: process.env.HYPERLIQUID_TESTNET_API_URL || 'https://api.hyperliquid-testnet.xyz',
     testnet: process.env.HYPERLIQUID_TESTNET === 'true',
+  },
+
+  // EVM RPCs
+  rpc: {
+    ethereum: process.env.ETHEREUM_RPC_URL || 'https://eth.llamarpc.com',
+    bsc: process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org',
+    polygon: process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com',
+    arbitrum: process.env.ARBITRUM_RPC_URL || 'https://arb1.arbitrum.io/rpc',
+    base: process.env.BASE_RPC_URL || 'https://mainnet.base.org',
   },
 
   // Moltbook

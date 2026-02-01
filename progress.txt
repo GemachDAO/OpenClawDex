@@ -64,11 +64,14 @@ TASKS
     - COMPLETED: Created swap service with executeSwap(), simulateSwap(), getSwapStatus(),
       getRecentSwaps(). REST endpoints for swap execution, simulation, status, and history.
 
-[ ] Task 7: Add multi-chain support (Solana, Hyperliquid)
+[x] Task 7: Add multi-chain support (Solana, Hyperliquid)
     - Create apps/api/src/config/chains.ts
     - Configure Solana RPC endpoints
     - Configure Hyperliquid connection
     - Files: apps/api/src/config/chains.ts, apps/api/src/config/index.ts
+    - COMPLETED: Created chains.ts with full chain configs for EVM (ETH, BSC, Polygon, Arbitrum, Base),
+      Solana (mainnet, devnet), Hyperliquid (mainnet, testnet). Added helper functions for chain lookup,
+      feature checks, explorer URLs. Updated config/index.ts with chain exports and RPC configs.
 
 --------------------------------------------------------------------------------
 
