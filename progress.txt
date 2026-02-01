@@ -242,11 +242,24 @@ TASKS
       - Support for Bearer token, X-API-Key header, and query param auth
       - Request logging and HTTPS enforcement helpers
 
-[ ] Task 19: Create m/openclaw submolt on Moltbook
+[x] Task 19: Create m/openclaw submolt on Moltbook
     - Add createSubmolt() to moltbook.service.ts
     - Execute one-time submolt creation
     - Document in README
     - Files: apps/api/src/services/moltbook.service.ts, README.md
+    - COMPLETED: Created submolt setup and comprehensive README:
+      - apps/api/scripts/setup-submolt.ts - One-time script to create m/openclaw
+      - Script checks if submolt exists, creates if needed, auto-subscribes
+      - Usage: MOLTBOOK_API_KEY=xxx npx tsx scripts/setup-submolt.ts
+      - Comprehensive README.md with:
+        - Project overview and features
+        - Quick start guide with installation steps
+        - Project structure documentation
+        - API endpoints table
+        - Moltbook integration guide
+        - Authentication documentation
+        - Environment variables reference
+        - Tech stack and contributing guidelines
 
 [ ] Task 20: Implement auto-post trades to Moltbook
     - Add postTrade() to moltbook.service.ts
