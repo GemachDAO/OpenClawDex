@@ -39,11 +39,14 @@ TASKS
 
 ## Phase 2: Backend Core Services
 
-[ ] Task 4: Implement wallet creation service using Gdex SDK
+[x] Task 4: Implement wallet creation service using Gdex SDK
     - Create apps/api/src/services/wallet.service.ts
     - Implement createWallet(), getBalance(), getWalletInfo()
     - Create apps/api/src/routes/wallet.ts
     - Files: apps/api/src/services/wallet.service.ts, apps/api/src/routes/wallet.ts
+    - COMPLETED: Created wallet service with ethers.js HDNodeWallet for mnemonic support,
+      Gdex SDK integration for balance/holdings, REST endpoints for create/import/balance/validate/chains.
+      Fixed CommonJS/ESM compatibility with dynamic import pattern.
 
 [ ] Task 5: Build quote fetching service for token prices
     - Create apps/api/src/services/quote.service.ts

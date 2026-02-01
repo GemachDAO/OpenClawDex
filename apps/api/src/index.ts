@@ -9,6 +9,9 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { config } from './config/index.js';
 
+// Import routes
+import walletRoutes from './routes/wallet.js';
+
 // Verify Gdex SDK is available
 let gdexAvailable = false;
 try {
@@ -56,6 +59,9 @@ app.get('/api', (_req: Request, res: Response) => {
     }
   });
 });
+
+// Register routes
+app.use('/api/wallet', walletRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
