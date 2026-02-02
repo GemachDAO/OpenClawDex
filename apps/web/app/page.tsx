@@ -93,8 +93,8 @@ function ActionCard({
 }) {
   return (
     <Link href={href} className="action-card p-5">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${accent}`}>
             {icon}
           </div>
