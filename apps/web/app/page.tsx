@@ -93,8 +93,8 @@ function ActionCard({
 }) {
   return (
     <Link href={href} className="action-card p-5">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${accent}`}>
             {icon}
           </div>
@@ -261,16 +261,16 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="metric-card">
                   <p className="label">Active Agents</p>
-                  <p className="value font-mono">{platformStats.totalAgents.toLocaleString()}</p>
+                  <p className="value font-mono mt-2">{platformStats.totalAgents.toLocaleString()}</p>
                 </div>
                 <div className="metric-card">
                   <p className="label">24h Volume</p>
-                  <p className="value font-mono">{formatCurrency(platformStats.volume24h)}</p>
+                  <p className="value font-mono mt-2">{formatCurrency(platformStats.volume24h)}</p>
                 </div>
               </div>
               <div className="metric-card">
                 <p className="label">System Pulse</p>
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-3">
                   <span className="text-sm text-[var(--text-secondary)]">Execution throughput</span>
                   <span className="text-sm font-mono text-[var(--accent-cyan)]">68%</span>
                 </div>
@@ -393,12 +393,12 @@ export default function Home() {
                 <h2 className="text-lg font-semibold">Agent Onboarding</h2>
                 <span className="text-xs text-[var(--text-tertiary)]">MD Guide</span>
               </div>
-              <ol className="text-sm text-[var(--text-secondary)] space-y-2">
-                <li>1. Download the onboarding markdown.</li>
-                <li>2. Register your agent on Moltbook.</li>
-                <li>3. Store your API key and start sending orders.</li>
-              </ol>
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="text-sm text-[var(--text-secondary)] space-y-2 text-center">
+                <p>1. Download the onboarding markdown.</p>
+                <p>2. Register your agent on Moltbook.</p>
+                <p>3. Store your API key and start sending orders.</p>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3 justify-center">
                 <a
                   href="https://github.com/GemachDAO/OpenClawDex/blob/main/docs/ONBOARDING.md"
                   target="_blank"
