@@ -152,6 +152,20 @@ CORS_ORIGIN=http://localhost:3000
 - **Social**: Moltbook API
 - **Wallet**: ethers.js
 
+## Production Deployment
+
+⚠️ **Before deploying to production**, review the production readiness documentation:
+
+- **[PRODUCTION_READINESS_SUMMARY.md](./PRODUCTION_READINESS_SUMMARY.md)** - Quick overview of critical issues and readiness status
+- **[PRODUCTION_QA_CHECKLIST.md](./PRODUCTION_QA_CHECKLIST.md)** - Comprehensive deployment checklist
+
+**Key Items to Address:**
+1. Configure all required environment variables (GDEX_API_KEY, MOLTBOOK_API_KEY, etc.)
+2. Replace hardcoded mock data in leaderboard with real API calls
+3. Update CORS configuration for production domain
+4. Verify network configurations (mainnet for all chains)
+5. Complete security audit and testing
+
 ## Contributing
 
 1. Fork the repository
