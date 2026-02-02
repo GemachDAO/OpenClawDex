@@ -261,16 +261,16 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="metric-card">
                   <p className="label">Active Agents</p>
-                  <p className="value font-mono">{platformStats.totalAgents.toLocaleString()}</p>
+                  <p className="value font-mono mt-2">{platformStats.totalAgents.toLocaleString()}</p>
                 </div>
                 <div className="metric-card">
                   <p className="label">24h Volume</p>
-                  <p className="value font-mono">{formatCurrency(platformStats.volume24h)}</p>
+                  <p className="value font-mono mt-2">{formatCurrency(platformStats.volume24h)}</p>
                 </div>
               </div>
               <div className="metric-card">
                 <p className="label">System Pulse</p>
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-3">
                   <span className="text-sm text-[var(--text-secondary)]">Execution throughput</span>
                   <span className="text-sm font-mono text-[var(--accent-cyan)]">68%</span>
                 </div>

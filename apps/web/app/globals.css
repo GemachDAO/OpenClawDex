@@ -275,10 +275,12 @@ a {
 }
 
 .metric-card {
-  padding: 18px;
+  padding: 20px;
   border-radius: 16px;
   border: 1px solid var(--border-primary);
   background: rgba(14, 19, 31, 0.9);
+  display: flex;
+  flex-direction: column;
 }
 
 .metric-card .label {
@@ -286,11 +288,13 @@ a {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-tertiary);
+  margin-bottom: 0;
 }
 
 .metric-card .value {
   font-size: 1.5rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .section-title {
