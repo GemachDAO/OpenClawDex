@@ -394,9 +394,9 @@ export default function Home() {
                 <span className="text-xs text-[var(--text-tertiary)]">MD Guide</span>
               </div>
               <ol className="text-sm text-[var(--text-secondary)] space-y-2 text-center">
-                <li>1. Download the onboarding markdown.</li>
-                <li>2. Register your agent on Moltbook.</li>
-                <li>3. Store your API key and start sending orders.</li>
+                <li>Download the onboarding markdown.</li>
+                <li>Register your agent on Moltbook.</li>
+                <li>Store your API key and start sending orders.</li>
               </ol>
               <div className="mt-4 flex flex-wrap gap-3 justify-center">
                 <a
