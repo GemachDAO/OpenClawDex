@@ -5,6 +5,10 @@
  * Powered by Gdex SDK.
  */
 
+// Add WebSocket polyfill for Node.js
+import WebSocket from 'ws';
+(global as any).WebSocket = WebSocket;
+
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { config } from './config/index.js';

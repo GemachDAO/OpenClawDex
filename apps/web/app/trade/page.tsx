@@ -1,13 +1,7 @@
 // @ts-nocheck
 /**
  * OpenClawDex Trading Interface
- * 
- * Unified trading page with tabs for:
- * - Swap: Token-to-token swaps
- * - Meme Coins: Buy/sell meme tokens on Solana
- * - Leverage: Perpetual trading on Hyperliquid
- * 
- * Note: Type errors will resolve when @json-render/react is installed
+ * Premium Neural Trading Terminal
  */
 
 'use client';
@@ -15,7 +9,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAppData, useAppActions } from '@/lib/providers';
-import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
 
 // ============================================================================
 // Types
@@ -100,49 +94,48 @@ function formatPercent(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
-function shortenAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
 // ============================================================================
 // Components
 // ============================================================================
 
-function TabButton({ 
-  active, 
-  onClick, 
-  children, 
-  icon 
-}: { 
-  active: boolean; 
-  onClick: () => void; 
+function TabButton({
+  active,
+  onClick,
+  children,
+  icon
+}: {
+  active: boolean;
+  onClick: () => void;
   children: React.ReactNode;
-  icon: string;
+  icon: React.ReactNode;
 }) {
   return (
     <button
       onClick={onClick}
       className={`
-        flex items-center gap-2 px-6 py-3 font-medium transition-all
-        ${active 
-          ? 'text-white border-b-2 border-violet-500 bg-violet-500/10' 
-          : 'text-[var(--muted)] hover:text-white hover:bg-[var(--card)]'
+        flex items-center gap-2.5 px-5 py-3 font-medium text-sm transition-all relative
+        ${active
+          ? 'text-[var(--accent-cyan)]'
+          : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
         }
       `}
     >
-      <span>{icon}</span>
+      <span className={active ? 'text-[var(--accent-cyan)]' : ''}>{icon}</span>
       {children}
+      {active && (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple)]" />
+      )}
     </button>
   );
 }
 
-function TokenSelector({ 
-  selected, 
-  tokens, 
+function TokenSelector({
+  selected,
+  tokens,
   onSelect,
-  label 
-}: { 
-  selected: Token | null; 
+  label
+}: {
+  selected: Token | null;
   tokens: Token[];
   onSelect: (token: Token) => void;
   label: string;
@@ -151,43 +144,46 @@ function TokenSelector({
 
   return (
     <div className="relative">
-      <label className="text-sm text-[var(--muted)] mb-1 block">{label}</label>
+      <label className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 block">{label}</label>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-3 rounded-lg border border-[var(--border)] bg-[var(--card)] flex items-center justify-between hover:border-violet-500/50 transition-colors"
+        className="w-full p-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] flex items-center justify-between hover:border-[var(--border-accent)] transition-colors"
       >
         {selected ? (
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-xs font-bold">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--accent-cyan)]/20 to-[var(--accent-purple)]/20 border border-[var(--border-primary)] flex items-center justify-center text-xs font-bold text-[var(--accent-cyan)]">
               {selected.symbol.charAt(0)}
             </div>
-            <span className="font-medium">{selected.symbol}</span>
+            <div className="text-left">
+              <span className="font-semibold">{selected.symbol}</span>
+              <span className="text-xs text-[var(--text-tertiary)] ml-2">{selected.name}</span>
+            </div>
           </div>
         ) : (
-          <span className="text-[var(--muted)]">Select token</span>
+          <span className="text-[var(--text-tertiary)]">Select token</span>
         )}
-        <svg className="w-5 h-5 text-[var(--muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={`w-4 h-4 text-[var(--text-tertiary)] transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      
+
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-lg border border-[var(--border)] bg-[var(--background)] shadow-xl z-50 max-h-60 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-elevated)] shadow-2xl z-50 max-h-60 overflow-y-auto animate-slide-down">
           {tokens.map((token) => (
             <button
               key={token.address}
               onClick={() => { onSelect(token); setIsOpen(false); }}
-              className="w-full p-2 rounded flex items-center gap-2 hover:bg-[var(--card)] transition-colors"
+              className="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-[var(--bg-secondary)] transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-sm font-bold">
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--accent-cyan)]/20 to-[var(--accent-purple)]/20 border border-[var(--border-primary)] flex items-center justify-center text-sm font-bold text-[var(--accent-cyan)]">
                 {token.symbol.charAt(0)}
               </div>
-              <div className="text-left">
+              <div className="text-left flex-1">
                 <p className="font-medium">{token.symbol}</p>
-                <p className="text-xs text-[var(--muted)]">{token.name}</p>
+                <p className="text-xs text-[var(--text-tertiary)]">{token.name}</p>
               </div>
               {token.price && (
-                <p className="ml-auto text-sm">${token.price.toLocaleString()}</p>
+                <p className="text-sm font-mono text-[var(--text-secondary)]">${token.price.toLocaleString()}</p>
               )}
             </button>
           ))}
@@ -204,20 +200,20 @@ function TokenSelector({
 function SwapTab() {
   const { execute } = useAppActions();
   const data = useAppData();
-  
+  const wallet = data.wallet || { connected: false };
+
   const [fromToken, setFromToken] = useState<Token | null>(POPULAR_TOKENS[0]);
   const [toToken, setToToken] = useState<Token | null>(POPULAR_TOKENS[1]);
   const [amount, setAmount] = useState('');
   const [slippage, setSlippage] = useState('0.5');
-  
-  const estimatedOutput = amount && fromToken && toToken 
+
+  const estimatedOutput = amount && fromToken && toToken
     ? (parseFloat(amount) * (fromToken.price || 0) / (toToken.price || 1) * 0.997).toFixed(6)
     : '0';
 
   const handleSwap = async () => {
     if (!fromToken || !toToken || !amount) return;
-    
-    // @ts-expect-error - Action type will be resolved when @json-render/react is installed
+
     await execute({
       type: 'executeSwap',
       fromToken: fromToken.symbol,
@@ -234,16 +230,19 @@ function SwapTab() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+    <div className="max-w-lg mx-auto">
+      <div className="glass-card-strong p-6 opacity-0 animate-scale-in" style={{ animationFillMode: 'forwards' }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">Swap Tokens</h2>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-[var(--muted)]">Slippage:</span>
-            <select 
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <span className="w-1 h-5 rounded-full bg-[var(--accent-cyan)]" />
+            Swap Tokens
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[var(--text-tertiary)]">Slippage</span>
+            <select
               value={slippage}
               onChange={(e) => setSlippage(e.target.value)}
-              className="bg-[var(--background)] border border-[var(--border)] rounded px-2 py-1"
+              className="text-sm"
             >
               <option value="0.1">0.1%</option>
               <option value="0.5">0.5%</option>
@@ -261,27 +260,29 @@ function SwapTab() {
             onSelect={setFromToken}
             label="From"
           />
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.0"
-            className="w-full mt-2 p-4 text-2xl bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
-          />
-          {fromToken?.price && amount && (
-            <p className="text-sm text-[var(--muted)] mt-1">
-              ≈ ${(parseFloat(amount || '0') * fromToken.price).toLocaleString()}
-            </p>
-          )}
+          <div className="relative mt-3">
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.0"
+              className="w-full p-4 text-2xl font-mono bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:border-[var(--accent-cyan)] transition-colors"
+            />
+            {fromToken?.price && amount && (
+              <p className="absolute right-4 bottom-4 text-sm text-[var(--text-tertiary)]">
+                ~${(parseFloat(amount || '0') * fromToken.price).toLocaleString()}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Swap Button */}
-        <div className="flex justify-center -my-2 relative z-10">
-          <button 
+        <div className="flex justify-center -my-3 relative z-10">
+          <button
             onClick={handleFlipTokens}
-            className="p-2 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-violet-500 transition-colors"
+            className="p-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-primary)] hover:border-[var(--accent-cyan)] hover:bg-[var(--bg-tertiary)] transition-all group"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-[var(--text-tertiary)] group-hover:text-[var(--accent-cyan)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
             </svg>
           </button>
@@ -295,30 +296,25 @@ function SwapTab() {
             onSelect={setToToken}
             label="To"
           />
-          <div className="w-full mt-2 p-4 text-2xl bg-[var(--background)] border border-[var(--border)] rounded-lg text-[var(--muted)]">
+          <div className="w-full mt-3 p-4 text-2xl font-mono bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl text-[var(--text-tertiary)]">
             {estimatedOutput}
           </div>
-          {toToken?.price && estimatedOutput !== '0' && (
-            <p className="text-sm text-[var(--muted)] mt-1">
-              ≈ ${(parseFloat(estimatedOutput) * toToken.price).toLocaleString()}
-            </p>
-          )}
         </div>
 
         {/* Swap Info */}
         {amount && fromToken && toToken && (
-          <div className="mb-6 p-3 rounded-lg bg-[var(--background)] text-sm space-y-2">
+          <div className="mb-6 p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-[var(--muted)]">Rate</span>
-              <span>1 {fromToken.symbol} = {((fromToken.price || 0) / (toToken.price || 1)).toFixed(6)} {toToken.symbol}</span>
+              <span className="text-[var(--text-tertiary)]">Rate</span>
+              <span className="font-mono">1 {fromToken.symbol} = {((fromToken.price || 0) / (toToken.price || 1)).toFixed(6)} {toToken.symbol}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[var(--muted)]">Price Impact</span>
-              <span className="text-green-400">&lt; 0.01%</span>
+              <span className="text-[var(--text-tertiary)]">Price Impact</span>
+              <span className="text-[var(--accent-green)]">&lt; 0.01%</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[var(--muted)]">Min. Received</span>
-              <span>{(parseFloat(estimatedOutput) * (1 - parseFloat(slippage) / 100)).toFixed(6)} {toToken.symbol}</span>
+              <span className="text-[var(--text-tertiary)]">Min. Received</span>
+              <span className="font-mono">{(parseFloat(estimatedOutput) * (1 - parseFloat(slippage) / 100)).toFixed(6)} {toToken.symbol}</span>
             </div>
           </div>
         )}
@@ -326,10 +322,10 @@ function SwapTab() {
         {/* Execute Button */}
         <button
           onClick={handleSwap}
-          disabled={!data.wallet.connected || !amount || !fromToken || !toToken}
-          className="w-full py-4 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500"
+          disabled={!wallet.connected || !amount || !fromToken || !toToken}
+          className="w-full py-4 rounded-xl font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed btn-primary"
         >
-          {!data.wallet.connected ? 'Connect Wallet' : !amount ? 'Enter Amount' : 'Swap'}
+          {!wallet.connected ? 'Connect Wallet' : !amount ? 'Enter Amount' : 'Swap'}
         </button>
       </div>
     </div>
@@ -343,7 +339,8 @@ function SwapTab() {
 function MemeCoinsTab() {
   const { execute } = useAppActions();
   const data = useAppData();
-  
+
+  const wallet = data.wallet || { connected: false };
   const [selectedMeme, setSelectedMeme] = useState<MemeToken | null>(null);
   const [buyAmount, setBuyAmount] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -355,7 +352,6 @@ function MemeCoinsTab() {
 
   const handleBuy = async () => {
     if (!selectedMeme || !buyAmount) return;
-    // @ts-expect-error - Action type will be resolved when @json-render/react is installed
     await execute({
       type: 'buyToken',
       tokenAddress: selectedMeme.address,
@@ -367,7 +363,6 @@ function MemeCoinsTab() {
 
   const handleSell = async () => {
     if (!selectedMeme || !buyAmount) return;
-    // @ts-expect-error - Action type will be resolved when @json-render/react is installed
     await execute({
       type: 'sellToken',
       tokenAddress: selectedMeme.address,
@@ -381,65 +376,70 @@ function MemeCoinsTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Token List */}
       <div className="lg:col-span-2">
-        <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">🚀 Trending Meme Coins</h2>
+        <div className="glass-card-strong p-6 opacity-0 animate-slide-up" style={{ animationFillMode: 'forwards' }}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <span className="w-1 h-5 rounded-full bg-[var(--accent-magenta)]" />
+              Trending Meme Coins
+            </h2>
             <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="pl-8 pr-4 py-2 bg-[var(--background)] border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:border-violet-500"
+                className="pl-9 pr-4 py-2 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg text-sm focus:outline-none focus:border-[var(--accent-cyan)] w-48"
               />
-              <svg className="w-4 h-4 absolute left-2.5 top-2.5 text-[var(--muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 absolute left-3 top-2.5 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="data-table">
               <thead>
-                <tr className="text-left text-sm text-[var(--muted)] border-b border-[var(--border)]">
-                  <th className="pb-3 font-medium">Token</th>
-                  <th className="pb-3 font-medium text-right">Price</th>
-                  <th className="pb-3 font-medium text-right">24h</th>
-                  <th className="pb-3 font-medium text-right">Market Cap</th>
-                  <th className="pb-3 font-medium text-right">Volume</th>
-                  <th className="pb-3 font-medium text-right">Holders</th>
+                <tr>
+                  <th>Token</th>
+                  <th className="text-right">Price</th>
+                  <th className="text-right">24h</th>
+                  <th className="text-right hide-mobile">Market Cap</th>
+                  <th className="text-right hide-mobile">Volume</th>
+                  <th className="text-right hide-mobile">Holders</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredMemes.map((meme) => (
-                  <tr 
+                {filteredMemes.map((meme, idx) => (
+                  <tr
                     key={meme.address}
                     onClick={() => setSelectedMeme(meme)}
-                    className={`
-                      border-b border-[var(--border)] cursor-pointer transition-colors
-                      ${selectedMeme?.address === meme.address ? 'bg-violet-500/10' : 'hover:bg-[var(--background)]'}
-                    `}
+                    className={`cursor-pointer transition-all ${
+                      selectedMeme?.address === meme.address
+                        ? 'bg-[var(--accent-cyan)]/5 border-l-2 border-l-[var(--accent-cyan)]'
+                        : ''
+                    }`}
+                    style={{ animationDelay: `${idx * 50}ms` }}
                   >
-                    <td className="py-4">
+                    <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-magenta)]/20 to-[var(--accent-orange)]/20 border border-[var(--border-primary)] flex items-center justify-center font-bold text-sm text-[var(--accent-magenta)]">
                           {meme.symbol.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-medium">{meme.symbol}</p>
-                          <p className="text-sm text-[var(--muted)]">{meme.name}</p>
+                          <p className="font-semibold">{meme.symbol}</p>
+                          <p className="text-xs text-[var(--text-tertiary)]">{meme.name}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 text-right font-mono">
+                    <td className="text-right font-mono text-sm">
                       ${meme.price && meme.price < 0.01 ? meme.price.toFixed(8) : meme.price?.toFixed(4)}
                     </td>
-                    <td className={`py-4 text-right ${(meme.priceChange24h || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <td className={`text-right font-mono text-sm ${(meme.priceChange24h || 0) >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
                       {formatPercent(meme.priceChange24h || 0)}
                     </td>
-                    <td className="py-4 text-right">{formatCurrency(meme.marketCap || 0)}</td>
-                    <td className="py-4 text-right">{formatCurrency(meme.volume24h || 0)}</td>
-                    <td className="py-4 text-right">{formatNumber(meme.holders || 0)}</td>
+                    <td className="text-right font-mono text-sm hide-mobile">{formatCurrency(meme.marketCap || 0)}</td>
+                    <td className="text-right font-mono text-sm hide-mobile">{formatCurrency(meme.volume24h || 0)}</td>
+                    <td className="text-right font-mono text-sm hide-mobile">{formatNumber(meme.holders || 0)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -450,86 +450,95 @@ function MemeCoinsTab() {
 
       {/* Trade Panel */}
       <div>
-        <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)] sticky top-24">
+        <div className="glass-card-strong p-6 sticky top-24 opacity-0 animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
           {selectedMeme ? (
             <>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center font-bold text-lg">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--accent-magenta)]/20 to-[var(--accent-orange)]/20 border border-[var(--border-primary)] flex items-center justify-center font-bold text-lg text-[var(--accent-magenta)]">
                   {selectedMeme.symbol.charAt(0)}
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{selectedMeme.symbol}</h3>
-                  <p className="text-sm text-[var(--muted)]">{selectedMeme.name}</p>
+                  <p className="text-sm text-[var(--text-tertiary)]">{selectedMeme.name}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-3 rounded-lg bg-[var(--background)]">
-                  <p className="text-xs text-[var(--muted)]">Price</p>
-                  <p className="font-semibold">${selectedMeme.price?.toFixed(8)}</p>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+                  <p className="text-xs text-[var(--text-tertiary)] mb-1">Price</p>
+                  <p className="font-semibold font-mono">${selectedMeme.price?.toFixed(8)}</p>
                 </div>
-                <div className="p-3 rounded-lg bg-[var(--background)]">
-                  <p className="text-xs text-[var(--muted)]">24h Change</p>
-                  <p className={`font-semibold ${(selectedMeme.priceChange24h || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+                  <p className="text-xs text-[var(--text-tertiary)] mb-1">24h Change</p>
+                  <p className={`font-semibold font-mono ${(selectedMeme.priceChange24h || 0) >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
                     {formatPercent(selectedMeme.priceChange24h || 0)}
                   </p>
                 </div>
               </div>
 
               <div className="mb-4">
-                <label className="text-sm text-[var(--muted)] mb-1 block">Amount (SOL)</label>
+                <label className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 block">Amount (SOL)</label>
                 <input
                   type="number"
                   value={buyAmount}
                   onChange={(e) => setBuyAmount(e.target.value)}
                   placeholder="0.0"
-                  className="w-full p-3 text-lg bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
+                  className="w-full p-4 text-xl font-mono bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:border-[var(--accent-cyan)]"
                 />
                 {buyAmount && selectedMeme.price && (
-                  <p className="text-sm text-[var(--muted)] mt-1">
-                    ≈ {(parseFloat(buyAmount) * 178 / selectedMeme.price).toLocaleString()} {selectedMeme.symbol}
+                  <p className="text-sm text-[var(--text-tertiary)] mt-2">
+                    ~ {(parseFloat(buyAmount) * 178 / selectedMeme.price).toLocaleString()} {selectedMeme.symbol}
                   </p>
                 )}
               </div>
 
-              <div className="flex gap-2 mb-4">
+              <div className="grid grid-cols-4 gap-2 mb-6">
                 {['0.1', '0.5', '1', '5'].map((val) => (
                   <button
                     key={val}
                     onClick={() => setBuyAmount(val)}
-                    className="flex-1 py-2 text-sm rounded bg-[var(--background)] hover:bg-violet-500/20 transition-colors"
+                    className={`py-2.5 text-sm rounded-lg transition-all ${
+                      buyAmount === val
+                        ? 'bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/30'
+                        : 'bg-[var(--bg-secondary)] border border-[var(--border-primary)] hover:border-[var(--border-accent)]'
+                    }`}
                   >
                     {val} SOL
                   </button>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <button
                   onClick={handleBuy}
-                  disabled={!data.wallet.connected || !buyAmount}
-                  className="py-3 rounded-lg font-semibold bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  disabled={!wallet.connected || !buyAmount}
+                  className="py-3.5 rounded-xl font-semibold bg-[var(--accent-green)] text-[var(--bg-primary)] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   Buy
                 </button>
                 <button
                   onClick={handleSell}
-                  disabled={!data.wallet.connected || !buyAmount}
-                  className="py-3 rounded-lg font-semibold bg-red-600 hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  disabled={!wallet.connected || !buyAmount}
+                  className="py-3.5 rounded-xl font-semibold bg-[var(--accent-red)] text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   Sell
                 </button>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[var(--border)]">
-                <p className="text-xs text-[var(--muted)] mb-2">Contract Address</p>
-                <p className="font-mono text-xs break-all">{selectedMeme.address}</p>
+              <div className="pt-4 border-t border-[var(--border-primary)]">
+                <p className="text-xs text-[var(--text-tertiary)] mb-1">Contract Address</p>
+                <p className="font-mono text-xs break-all text-[var(--text-secondary)]">{selectedMeme.address}</p>
               </div>
             </>
           ) : (
-            <div className="text-center py-8 text-[var(--muted)]">
-              <span className="text-4xl mb-3 block">🎯</span>
-              <p>Select a token to trade</p>
+            <div className="text-center py-12 text-[var(--text-tertiary)]">
+              <div className="w-14 h-14 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center mx-auto mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--text-tertiary)]">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+              </div>
+              <p className="font-medium mb-1">Select a Token</p>
+              <p className="text-sm">Choose from the list to trade</p>
             </div>
           )}
         </div>
@@ -545,7 +554,8 @@ function MemeCoinsTab() {
 function LeverageTab() {
   const { execute } = useAppActions();
   const data = useAppData();
-  
+
+  const wallet = data.wallet || { connected: false };
   const [selectedMarket, setSelectedMarket] = useState<Market>(PERP_MARKETS[0]);
   const [side, setSide] = useState<'long' | 'short'>('long');
   const [leverage, setLeverage] = useState(10);
@@ -556,7 +566,7 @@ function LeverageTab() {
   const [stopLoss, setStopLoss] = useState('');
 
   const positionSize = amount ? parseFloat(amount) * leverage : 0;
-  const liquidationPrice = selectedMarket && amount 
+  const liquidationPrice = selectedMarket && amount
     ? side === 'long'
       ? selectedMarket.price * (1 - 1 / leverage * 0.9)
       : selectedMarket.price * (1 + 1 / leverage * 0.9)
@@ -564,8 +574,7 @@ function LeverageTab() {
 
   const handleOpenPosition = async () => {
     if (!amount) return;
-    
-    // @ts-expect-error - Action type will be resolved when @json-render/react is installed
+
     await execute({
       type: 'openPosition',
       market: selectedMarket.symbol,
@@ -577,7 +586,7 @@ function LeverageTab() {
       takeProfit: takeProfit ? parseFloat(takeProfit) : undefined,
       stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
     });
-    
+
     setAmount('');
     setTakeProfit('');
     setStopLoss('');
@@ -586,54 +595,59 @@ function LeverageTab() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Markets List */}
-      <div className="lg:col-span-2">
-        <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <h2 className="text-lg font-semibold mb-4">⚡ Perpetual Markets</h2>
-          
+      <div className="lg:col-span-2 space-y-6">
+        <div className="glass-card-strong p-6 opacity-0 animate-slide-up" style={{ animationFillMode: 'forwards' }}>
+          <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
+            <span className="w-1 h-5 rounded-full bg-[var(--accent-orange)]" />
+            Perpetual Markets
+          </h2>
+
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="data-table">
               <thead>
-                <tr className="text-left text-sm text-[var(--muted)] border-b border-[var(--border)]">
-                  <th className="pb-3 font-medium">Market</th>
-                  <th className="pb-3 font-medium text-right">Price</th>
-                  <th className="pb-3 font-medium text-right">24h</th>
-                  <th className="pb-3 font-medium text-right">Volume</th>
-                  <th className="pb-3 font-medium text-right">Open Interest</th>
-                  <th className="pb-3 font-medium text-right">Funding</th>
-                  <th className="pb-3 font-medium text-right">Max Lev</th>
+                <tr>
+                  <th>Market</th>
+                  <th className="text-right">Price</th>
+                  <th className="text-right">24h</th>
+                  <th className="text-right hide-mobile">Volume</th>
+                  <th className="text-right hide-mobile">Open Interest</th>
+                  <th className="text-right hide-mobile">Funding</th>
+                  <th className="text-right">Max Lev</th>
                 </tr>
               </thead>
               <tbody>
-                {PERP_MARKETS.map((market) => (
-                  <tr 
+                {PERP_MARKETS.map((market, idx) => (
+                  <tr
                     key={market.symbol}
                     onClick={() => setSelectedMarket(market)}
-                    className={`
-                      border-b border-[var(--border)] cursor-pointer transition-colors
-                      ${selectedMarket?.symbol === market.symbol ? 'bg-violet-500/10' : 'hover:bg-[var(--background)]'}
-                    `}
+                    className={`cursor-pointer ${
+                      selectedMarket?.symbol === market.symbol
+                        ? 'bg-[var(--accent-cyan)]/5 border-l-2 border-l-[var(--accent-cyan)]'
+                        : ''
+                    }`}
+                    style={{ animationDelay: `${idx * 50}ms` }}
                   >
-                    <td className="py-4">
+                    <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-bold text-sm">
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--accent-blue)]/20 to-[var(--accent-cyan)]/20 border border-[var(--border-primary)] flex items-center justify-center font-bold text-sm text-[var(--accent-cyan)]">
                           {market.symbol.split('-')[0].charAt(0)}
                         </div>
                         <div>
-                          <p className="font-medium">{market.symbol}</p>
-                          <p className="text-xs text-[var(--muted)]">{market.name}</p>
+                          <p className="font-semibold">{market.symbol}</p>
+                          <p className="text-xs text-[var(--text-tertiary)]">{market.name}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 text-right font-mono">{formatCurrency(market.price)}</td>
-                    <td className={`py-4 text-right ${market.priceChange24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <td className="text-right font-mono">{formatCurrency(market.price)}</td>
+                    <td className={`text-right font-mono ${market.priceChange24h >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
                       {formatPercent(market.priceChange24h)}
                     </td>
-                    <td className="py-4 text-right">{formatCurrency(market.volume24h)}</td>
-                    <td className="py-4 text-right">{formatCurrency(market.openInterest)}</td>
-                    <td className={`py-4 text-right ${market.fundingRate >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <td className="text-right font-mono hide-mobile">{formatCurrency(market.volume24h)}</td>
+                    <td className="text-right font-mono hide-mobile">{formatCurrency(market.openInterest)}</td>
+                    <td className={`text-right font-mono hide-mobile ${market.fundingRate >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
                       {(market.fundingRate * 100).toFixed(4)}%
                     </td>
-                    <td className="py-4 text-right">{market.maxLeverage}x</td>
+                    <td className="text-right font-semibold">{market.maxLeverage}x</td>
                   </tr>
                 ))}
               </tbody>
@@ -641,23 +655,25 @@ function LeverageTab() {
           </div>
         </div>
 
-        {/* Simple Chart Placeholder */}
-        <div className="mt-6 p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+        {/* Chart Placeholder */}
+        <div className="glass-card-strong p-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">{selectedMarket.symbol} Chart</h3>
-            <div className="flex gap-2">
+            <h3 className="font-semibold">{selectedMarket.symbol}</h3>
+            <div className="flex gap-1">
               {['1H', '4H', '1D', '1W'].map((tf) => (
-                <button key={tf} className="px-3 py-1 text-sm rounded bg-[var(--background)] hover:bg-violet-500/20">
+                <button key={tf} className="px-3 py-1.5 text-xs rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)] hover:border-[var(--border-accent)] transition-colors">
                   {tf}
                 </button>
               ))}
             </div>
           </div>
-          <div className="h-64 flex items-center justify-center text-[var(--muted)] border border-[var(--border)] rounded-lg">
-            <div className="text-center">
-              <p className="text-4xl mb-2">📈</p>
-              <p>TradingView Chart</p>
-              <p className="text-sm">Coming Soon</p>
+          <div className="h-64 flex items-center justify-center rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="text-center text-[var(--text-tertiary)]">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto mb-2">
+                <path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/>
+              </svg>
+              <p className="text-sm">TradingView Chart</p>
+              <p className="text-xs">Coming Soon</p>
             </div>
           </div>
         </div>
@@ -665,30 +681,30 @@ function LeverageTab() {
 
       {/* Order Panel */}
       <div>
-        <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)] sticky top-24">
+        <div className="glass-card-strong p-6 sticky top-24 opacity-0 animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-semibold">{selectedMarket.symbol}</h3>
             <span className="font-mono text-lg">{formatCurrency(selectedMarket.price)}</span>
           </div>
 
           {/* Side Toggle */}
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-2 gap-2 mb-5">
             <button
               onClick={() => setSide('long')}
-              className={`py-3 rounded-lg font-semibold transition-colors ${
-                side === 'long' 
-                  ? 'bg-green-600 text-white' 
-                  : 'bg-[var(--background)] text-[var(--muted)] hover:text-white'
+              className={`py-3 rounded-xl font-semibold transition-all ${
+                side === 'long'
+                  ? 'bg-[var(--accent-green)] text-[var(--bg-primary)]'
+                  : 'bg-[var(--bg-secondary)] text-[var(--text-tertiary)] border border-[var(--border-primary)] hover:border-[var(--accent-green)]'
               }`}
             >
               Long
             </button>
             <button
               onClick={() => setSide('short')}
-              className={`py-3 rounded-lg font-semibold transition-colors ${
-                side === 'short' 
-                  ? 'bg-red-600 text-white' 
-                  : 'bg-[var(--background)] text-[var(--muted)] hover:text-white'
+              className={`py-3 rounded-xl font-semibold transition-all ${
+                side === 'short'
+                  ? 'bg-[var(--accent-red)] text-white'
+                  : 'bg-[var(--bg-secondary)] text-[var(--text-tertiary)] border border-[var(--border-primary)] hover:border-[var(--accent-red)]'
               }`}
             >
               Short
@@ -696,19 +712,23 @@ function LeverageTab() {
           </div>
 
           {/* Order Type */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-5">
             <button
               onClick={() => setOrderType('market')}
-              className={`flex-1 py-2 text-sm rounded transition-colors ${
-                orderType === 'market' ? 'bg-violet-600' : 'bg-[var(--background)]'
+              className={`flex-1 py-2.5 text-sm rounded-lg transition-all ${
+                orderType === 'market'
+                  ? 'bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/30'
+                  : 'bg-[var(--bg-secondary)] border border-[var(--border-primary)]'
               }`}
             >
               Market
             </button>
             <button
               onClick={() => setOrderType('limit')}
-              className={`flex-1 py-2 text-sm rounded transition-colors ${
-                orderType === 'limit' ? 'bg-violet-600' : 'bg-[var(--background)]'
+              className={`flex-1 py-2.5 text-sm rounded-lg transition-all ${
+                orderType === 'limit'
+                  ? 'bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/30'
+                  : 'bg-[var(--bg-secondary)] border border-[var(--border-primary)]'
               }`}
             >
               Limit
@@ -718,34 +738,34 @@ function LeverageTab() {
           {/* Limit Price */}
           {orderType === 'limit' && (
             <div className="mb-4">
-              <label className="text-sm text-[var(--muted)] mb-1 block">Limit Price</label>
+              <label className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 block">Limit Price</label>
               <input
                 type="number"
                 value={limitPrice}
                 onChange={(e) => setLimitPrice(e.target.value)}
                 placeholder={selectedMarket.price.toString()}
-                className="w-full p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
+                className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:border-[var(--accent-cyan)] font-mono"
               />
             </div>
           )}
 
           {/* Amount */}
           <div className="mb-4">
-            <label className="text-sm text-[var(--muted)] mb-1 block">Size (USD)</label>
+            <label className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 block">Size (USD)</label>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.0"
-              className="w-full p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
+              className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl focus:outline-none focus:border-[var(--accent-cyan)] font-mono"
             />
           </div>
 
           {/* Leverage Slider */}
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-[var(--muted)]">Leverage</span>
-              <span className="font-semibold">{leverage}x</span>
+          <div className="mb-5">
+            <div className="flex justify-between text-sm mb-3">
+              <span className="text-[var(--text-tertiary)]">Leverage</span>
+              <span className="font-semibold text-[var(--accent-cyan)]">{leverage}x</span>
             </div>
             <input
               type="range"
@@ -753,22 +773,24 @@ function LeverageTab() {
               max={selectedMarket.maxLeverage}
               value={leverage}
               onChange={(e) => setLeverage(parseInt(e.target.value))}
-              className="w-full accent-violet-500"
+              className="w-full"
             />
-            <div className="flex justify-between text-xs text-[var(--muted)]">
+            <div className="flex justify-between text-xs text-[var(--text-tertiary)] mt-1">
               <span>1x</span>
               <span>{selectedMarket.maxLeverage}x</span>
             </div>
           </div>
 
-          {/* Quick Leverage Buttons */}
-          <div className="flex gap-2 mb-4">
+          {/* Quick Leverage */}
+          <div className="grid grid-cols-4 gap-2 mb-5">
             {[5, 10, 25, 50].filter(l => l <= selectedMarket.maxLeverage).map((lev) => (
               <button
                 key={lev}
                 onClick={() => setLeverage(lev)}
-                className={`flex-1 py-2 text-sm rounded transition-colors ${
-                  leverage === lev ? 'bg-violet-600' : 'bg-[var(--background)] hover:bg-violet-500/20'
+                className={`py-2 text-sm rounded-lg transition-all ${
+                  leverage === lev
+                    ? 'bg-[var(--accent-cyan)]/20 text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/30'
+                    : 'bg-[var(--bg-secondary)] border border-[var(--border-primary)] hover:border-[var(--border-accent)]'
                 }`}
               >
                 {lev}x
@@ -777,47 +799,47 @@ function LeverageTab() {
           </div>
 
           {/* TP/SL */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-3 mb-5">
             <div>
-              <label className="text-xs text-[var(--muted)] mb-1 block">Take Profit</label>
+              <label className="text-xs text-[var(--text-tertiary)] mb-1 block">Take Profit</label>
               <input
                 type="number"
                 value={takeProfit}
                 onChange={(e) => setTakeProfit(e.target.value)}
                 placeholder="TP Price"
-                className="w-full p-2 text-sm bg-[var(--background)] border border-[var(--border)] rounded focus:outline-none focus:border-green-500"
+                className="w-full p-2.5 text-sm bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:outline-none focus:border-[var(--accent-green)] font-mono"
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--muted)] mb-1 block">Stop Loss</label>
+              <label className="text-xs text-[var(--text-tertiary)] mb-1 block">Stop Loss</label>
               <input
                 type="number"
                 value={stopLoss}
                 onChange={(e) => setStopLoss(e.target.value)}
                 placeholder="SL Price"
-                className="w-full p-2 text-sm bg-[var(--background)] border border-[var(--border)] rounded focus:outline-none focus:border-red-500"
+                className="w-full p-2.5 text-sm bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:outline-none focus:border-[var(--accent-red)] font-mono"
               />
             </div>
           </div>
 
           {/* Position Info */}
           {amount && (
-            <div className="mb-4 p-3 rounded-lg bg-[var(--background)] text-sm space-y-2">
+            <div className="mb-5 p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-[var(--muted)]">Position Size</span>
-                <span>{formatCurrency(positionSize)}</span>
+                <span className="text-[var(--text-tertiary)]">Position Size</span>
+                <span className="font-mono">{formatCurrency(positionSize)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[var(--muted)]">Margin Required</span>
-                <span>{formatCurrency(parseFloat(amount))}</span>
+                <span className="text-[var(--text-tertiary)]">Margin Required</span>
+                <span className="font-mono">{formatCurrency(parseFloat(amount))}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[var(--muted)]">Liq. Price</span>
-                <span className="text-red-400">{formatCurrency(liquidationPrice)}</span>
+                <span className="text-[var(--text-tertiary)]">Liq. Price</span>
+                <span className="text-[var(--accent-red)] font-mono">{formatCurrency(liquidationPrice)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[var(--muted)]">Fees (0.05%)</span>
-                <span>{formatCurrency(positionSize * 0.0005)}</span>
+                <span className="text-[var(--text-tertiary)]">Fees (0.05%)</span>
+                <span className="font-mono">{formatCurrency(positionSize * 0.0005)}</span>
               </div>
             </div>
           )}
@@ -825,22 +847,22 @@ function LeverageTab() {
           {/* Execute Button */}
           <button
             onClick={handleOpenPosition}
-            disabled={!data.wallet.connected || !amount}
-            className={`w-full py-4 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-              side === 'long' 
-                ? 'bg-green-600 hover:bg-green-500' 
-                : 'bg-red-600 hover:bg-red-500'
+            disabled={!wallet.connected || !amount}
+            className={`w-full py-4 rounded-xl font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              side === 'long'
+                ? 'bg-[var(--accent-green)] text-[var(--bg-primary)] hover:opacity-90'
+                : 'bg-[var(--accent-red)] text-white hover:opacity-90'
             }`}
           >
-            {!data.wallet.connected 
-              ? 'Connect Wallet' 
-              : !amount 
-                ? 'Enter Amount' 
+            {!wallet.connected
+              ? 'Connect Wallet'
+              : !amount
+                ? 'Enter Amount'
                 : `${side === 'long' ? 'Long' : 'Short'} ${selectedMarket.symbol}`
             }
           </button>
 
-          <p className="text-xs text-center text-[var(--muted)] mt-3">
+          <p className="text-xs text-center text-[var(--text-tertiary)] mt-4">
             Trading on Hyperliquid • No gas fees
           </p>
         </div>
@@ -857,71 +879,49 @@ export default function TradePage() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'swap';
   const [activeTab, setActiveTab] = useState(initialTab);
-  const data = useAppData();
-  const { execute } = useAppActions();
 
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab) setActiveTab(tab);
   }, [searchParams]);
 
-  const handleConnectWallet = () => {
-    // @ts-expect-error - Action type will be resolved when @json-render/react is installed
-    execute({ type: 'connectWallet' });
-  };
-
   return (
     <main className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[var(--card)]/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-2xl">🦞</span>
-              <span className="font-bold">OpenClawDex</span>
-            </Link>
-          </div>
-          
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-[var(--muted)] hover:text-white transition-colors">Dashboard</Link>
-            <Link href="/trade" className="text-violet-400 font-medium">Trade</Link>
-            <Link href="/copy" className="text-[var(--muted)] hover:text-white transition-colors">Copy</Link>
-            <Link href="/leaderboard" className="text-[var(--muted)] hover:text-white transition-colors">Leaderboard</Link>
-          </nav>
+      {/* Background Effects */}
+      <div className="neural-grid" />
+      <div className="neural-orbs" />
 
-          {data.wallet.connected ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)]">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm font-mono">{shortenAddress(data.wallet.address || '')}</span>
-            </div>
-          ) : (
-            <button 
-              onClick={handleConnectWallet}
-              className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-medium text-sm transition-all"
-            >
-              Connect
-            </button>
-          )}
-        </div>
-      </header>
+      <Header />
 
       {/* Tab Navigation */}
-      <div className="border-b border-[var(--border)]">
-        <div className="max-w-7xl mx-auto px-6 flex">
-          <TabButton active={activeTab === 'swap'} onClick={() => setActiveTab('swap')} icon="💱">
+      <div className="border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]/30">
+        <div className="max-w-[1400px] mx-auto px-6 flex">
+          <TabButton
+            active={activeTab === 'swap'}
+            onClick={() => setActiveTab('swap')}
+            icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>}
+          >
             Swap
           </TabButton>
-          <TabButton active={activeTab === 'meme'} onClick={() => setActiveTab('meme')} icon="🚀">
+          <TabButton
+            active={activeTab === 'meme'}
+            onClick={() => setActiveTab('meme')}
+            icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>}
+          >
             Meme Coins
           </TabButton>
-          <TabButton active={activeTab === 'leverage'} onClick={() => setActiveTab('leverage')} icon="⚡">
+          <TabButton
+            active={activeTab === 'leverage'}
+            onClick={() => setActiveTab('leverage')}
+            icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 5-5"/></svg>}
+          >
             Leverage
           </TabButton>
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-[1400px] mx-auto px-6 py-8">
         {activeTab === 'swap' && <SwapTab />}
         {activeTab === 'meme' && <MemeCoinsTab />}
         {activeTab === 'leverage' && <LeverageTab />}

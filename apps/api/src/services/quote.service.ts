@@ -176,7 +176,7 @@ export async function getTokenPrice(
     const sdk = await getSDK();
     
     // Get token info from SDK
-    const tokenInfo = await sdk.tokens.getToken(tokenAddress, chainId);
+    const tokenInfo = await sdk.tokens.getToken(tokenAddress);
 
     if (!tokenInfo || tokenInfo.error) {
       throw new Error(tokenInfo?.error || 'Token not found');
@@ -205,27 +205,27 @@ export async function getTokenPrices(
 ): Promise<TokenPrice[]> {
   try {
     const sdk = await getSDK();
-    
-    // Get multiple token info from SDK
-    const tokensInfo = await sdk.tokens.getTokens(tokenAddresses, chainId);
-
-    if (!tokensInfo || tokensInfo.error) {
-      throw new Error(tokensInfo?.error || 'Failed to get tokens');
-    }
-
     const prices: TokenPrice[] = [];
-    const tokensArray = Array.isArray(tokensInfo) ? tokensInfo : [tokensInfo];
     
-    for (const token of tokensArray) {
-      prices.push({
-        address: token.address || '',
-        symbol: token.symbol || 'UNKNOWN',
-        priceUsd: token.priceUsd || 0,
-        priceChange24h: token.priceChange24h || 0,
-        volume24h: token.volume24h || 0,
-        marketCap: token.marketCap || 0,
-        lastUpdated: token.lastUpdated || new Date().toISOString(),
-      });
+    // Iterate through addresses since SDK getToken handles one at a time
+    for (const tokenAddress of tokenAddresses) {
+      try {
+        const token = await sdk.tokens.getToken(tokenAddress);
+        
+        if (token && !token.error) {
+          prices.push({
+            address: token.address || tokenAddress,
+            symbol: token.symbol || "UNKNOWN",
+            priceUsd: token.priceUsd || 0,
+            priceChange24h: token.priceChange24h || 0,
+            volume24h: token.volume24h || 0,
+            marketCap: token.marketCap || 0,
+            lastUpdated: token.lastUpdated || new Date().toISOString(),
+          });
+        }
+      } catch (err) {
+        console.warn(`Failed to get token ${tokenAddress}:`, err);
+      }
     }
 
     return prices;
@@ -246,7 +246,7 @@ export async function searchTokens(
     const sdk = await getSDK();
     
     // Search tokens via SDK
-    const searchResults = await sdk.tokens.searchTokens(query, chainId, limit);
+    const searchResults = await sdk.tokens.searchTokens(query, limit);
 
     if (!searchResults || searchResults.error) {
       return [];
@@ -284,7 +284,7 @@ export async function getTrendingTokens(
     const sdk = await getSDK();
     
     // Get trending tokens via SDK
-    const trendingResults = await sdk.tokens.getTrending(chainId, limit);
+    const trendingResults = await sdk.tokens.getTrendingTokens(limit);
 
     if (!trendingResults || trendingResults.error) {
       return [];

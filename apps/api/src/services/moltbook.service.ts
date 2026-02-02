@@ -78,7 +78,7 @@ export interface ValidationResult {
 // ============================================================================
 
 const MOLTBOOK_BASE_URL = 'https://www.moltbook.com/api/v1';
-const OPENCLAW_SUBMOLT = 'openclaw';
+export const OPENCLAW_SUBMOLT = 'openclaw';
 
 // ============================================================================
 // Helper Functions

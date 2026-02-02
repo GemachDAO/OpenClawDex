@@ -117,7 +117,7 @@ export async function listMemeCoins(
       timeframe: filter?.timeframe || '24h',
     };
 
-    const response = await sdk.tokens.getTrending(params.chainId, params.limit, params);
+    const response = await sdk.tokens.getTrendingTokens(limit);
 
     if (!response || response.error) {
       return [];
@@ -143,7 +143,7 @@ export async function getTokenInfo(tokenAddress: string): Promise<MemeCoinInfo |
   try {
     const sdk = await getSDK();
 
-    const response = await sdk.tokens.getToken(tokenAddress, 'solana-mainnet');
+    const response = await sdk.tokens.getToken(tokenAddress);
 
     if (!response || response.error) {
       return null;
@@ -165,7 +165,7 @@ export async function searchMemeCoins(
   try {
     const sdk = await getSDK();
 
-    const response = await sdk.tokens.searchTokens(query, 'solana-mainnet', limit);
+    const response = await sdk.tokens.searchTokens(query, limit);
 
     if (!response || response.error) {
       return [];
@@ -200,7 +200,7 @@ export async function buyToken(
     const sdk = await getSDK();
 
     // Get token info first
-    const tokenInfo = await sdk.tokens.getToken(tokenAddress, 'solana-mainnet');
+    const tokenInfo = await sdk.tokens.getToken(tokenAddress);
     const tokenSymbol = tokenInfo?.symbol || 'UNKNOWN';
 
     // Execute buy via SDK
@@ -281,7 +281,7 @@ export async function sellToken(
     const sdk = await getSDK();
 
     // Get token info first
-    const tokenInfo = await sdk.tokens.getToken(tokenAddress, 'solana-mainnet');
+    const tokenInfo = await sdk.tokens.getToken(tokenAddress);
     const tokenSymbol = tokenInfo?.symbol || 'UNKNOWN';
 
     // Execute sell via SDK
@@ -359,7 +359,7 @@ export async function getBondingCurveInfo(tokenAddress: string): Promise<{
   try {
     const sdk = await getSDK();
 
-    const response = await sdk.tokens.getToken(tokenAddress, 'solana-mainnet');
+    const response = await sdk.tokens.getToken(tokenAddress);
 
     if (!response || response.error) {
       return null;
@@ -397,7 +397,7 @@ export async function getNewLaunches(
       maxAge,
     };
 
-    const response = await sdk.tokens.getNewTokens(params.chainId, params.limit, params);
+    const response = await sdk.tokens.getNewestTokens(1, 1, "", limit);
 
     if (!response || response.error) {
       return [];
@@ -431,7 +431,7 @@ export async function getGraduatedTokens(limit: number = 20): Promise<MemeCoinIn
       sortOrder: 'desc',
     };
 
-    const response = await sdk.tokens.getTrending(params.chainId, params.limit, params);
+    const response = await sdk.tokens.getTrendingTokens(params.limit);
 
     if (!response || response.error) {
       return [];

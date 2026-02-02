@@ -1,19 +1,14 @@
 // @ts-nocheck
 /**
  * OpenClawDex Copy Trading Interface
- * 
- * Browse and follow top traders to automatically copy their trades.
- * Features:
- * - Top traders leaderboard with performance stats
- * - Trader profile cards with PnL, win rate, followers
- * - Follow/unfollow with customizable copy settings
- * - Active copy positions tracker
+ * Premium Neural Strategy Replication
  */
 
 'use client';
 
 import { useState } from 'react';
 import { useAppData, useAppActions } from '@/lib/providers';
+import { Header } from '@/components/layout/Header';
 import Link from 'next/link';
 
 // ============================================================================
@@ -203,134 +198,138 @@ function shortenAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-function getTradingStyleColor(style: string): string {
-  switch (style) {
-    case 'scalper': return 'text-orange-400 bg-orange-400/10';
-    case 'swing': return 'text-blue-400 bg-blue-400/10';
-    case 'position': return 'text-green-400 bg-green-400/10';
-    default: return 'text-purple-400 bg-purple-400/10';
-  }
+function getStyleTag(style: string): string {
+  return `style-tag style-tag-${style}`;
 }
 
-function getRiskLevel(maxDrawdown: number): { label: string; color: string } {
-  if (maxDrawdown < 10) return { label: 'Low Risk', color: 'text-green-400' };
-  if (maxDrawdown < 20) return { label: 'Medium Risk', color: 'text-yellow-400' };
-  if (maxDrawdown < 35) return { label: 'High Risk', color: 'text-orange-400' };
-  return { label: 'Very High Risk', color: 'text-red-400' };
+function getRiskLevel(maxDrawdown: number): { label: string; class: string } {
+  if (maxDrawdown < 10) return { label: 'Low Risk', class: 'risk-low' };
+  if (maxDrawdown < 20) return { label: 'Medium Risk', class: 'risk-medium' };
+  if (maxDrawdown < 35) return { label: 'High Risk', class: 'risk-high' };
+  return { label: 'Very High', class: 'risk-extreme' };
 }
 
 // ============================================================================
 // Components
 // ============================================================================
 
-function TraderCard({ 
-  trader, 
-  onFollow, 
-  isFollowing 
-}: { 
-  trader: Trader; 
+function TraderCard({
+  trader,
+  onFollow,
+  isFollowing,
+  index
+}: {
+  trader: Trader;
   onFollow: (trader: Trader) => void;
   isFollowing: boolean;
+  index: number;
 }) {
   const risk = getRiskLevel(trader.maxDrawdown);
-  
+
   return (
-    <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-violet-500/50 transition-all">
+    <div
+      className="glow-card p-6 opacity-0 animate-slide-up holo-shimmer"
+      style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+    >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center font-bold text-lg">
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--accent-cyan)] to-[var(--accent-purple)] flex items-center justify-center font-bold text-xl text-[var(--bg-primary)]">
             {trader.displayName.charAt(0)}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{trader.displayName}</h3>
+              <h3 className="font-semibold text-lg">{trader.displayName}</h3>
               {trader.isVerified && (
-                <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
+                <div className="verified-badge">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
               )}
             </div>
-            <p className="text-sm text-[var(--muted)] font-mono">{shortenAddress(trader.walletAddress)}</p>
+            <p className="text-sm text-[var(--text-tertiary)] font-mono">{shortenAddress(trader.walletAddress)}</p>
           </div>
         </div>
-        <span className={`px-2 py-1 rounded text-xs font-medium ${getTradingStyleColor(trader.tradingStyle)}`}>
+        <span className={getStyleTag(trader.tradingStyle)}>
           {trader.tradingStyle}
         </span>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div>
-          <p className="text-xs text-[var(--muted)]">Total PnL</p>
-          <p className={`font-semibold ${trader.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+      <div className="grid grid-cols-3 gap-4 mb-5">
+        <div className="text-center p-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+          <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider mb-1">Total PnL</p>
+          <p className={`font-bold font-mono ${trader.totalPnl >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
             {formatCurrency(trader.totalPnl)}
           </p>
-          <p className={`text-xs ${trader.totalPnlPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+          <p className={`text-xs font-mono ${trader.totalPnlPercent >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
             {formatPercent(trader.totalPnlPercent)}
           </p>
         </div>
-        <div>
-          <p className="text-xs text-[var(--muted)]">Win Rate</p>
-          <p className="font-semibold">{trader.winRate}%</p>
-          <p className="text-xs text-[var(--muted)]">{trader.totalTrades} trades</p>
+        <div className="text-center p-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+          <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider mb-1">Win Rate</p>
+          <p className="font-bold font-mono">{trader.winRate}%</p>
+          <p className="text-xs text-[var(--text-tertiary)]">{formatNumber(trader.totalTrades)} trades</p>
         </div>
-        <div>
-          <p className="text-xs text-[var(--muted)]">Sharpe</p>
-          <p className="font-semibold">{trader.sharpeRatio}</p>
-          <p className={`text-xs ${risk.color}`}>{risk.label}</p>
+        <div className="text-center p-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+          <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider mb-1">Sharpe</p>
+          <p className="font-bold font-mono">{trader.sharpeRatio}</p>
+          <span className={`risk-indicator ${risk.class}`}>{risk.label}</span>
         </div>
       </div>
 
       {/* Recent Performance */}
-      <div className="flex gap-4 mb-4 p-3 rounded-lg bg-[var(--background)]">
-        <div className="flex-1">
-          <p className="text-xs text-[var(--muted)]">7D PnL</p>
-          <p className={`font-medium ${trader.last7dPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+      <div className="flex gap-3 mb-5 p-3 rounded-lg bg-[var(--bg-secondary)]/50 border border-[var(--border-primary)]">
+        <div className="flex-1 text-center">
+          <p className="text-xs text-[var(--text-tertiary)]">7D PnL</p>
+          <p className={`font-semibold font-mono ${trader.last7dPnl >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
             {formatCurrency(trader.last7dPnl)}
           </p>
         </div>
-        <div className="flex-1">
-          <p className="text-xs text-[var(--muted)]">30D PnL</p>
-          <p className={`font-medium ${trader.last30dPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        <div className="w-px bg-[var(--border-primary)]" />
+        <div className="flex-1 text-center">
+          <p className="text-xs text-[var(--text-tertiary)]">30D PnL</p>
+          <p className={`font-semibold font-mono ${trader.last30dPnl >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
             {formatCurrency(trader.last30dPnl)}
           </p>
         </div>
-        <div className="flex-1">
-          <p className="text-xs text-[var(--muted)]">Max DD</p>
-          <p className="font-medium text-red-400">-{trader.maxDrawdown}%</p>
+        <div className="w-px bg-[var(--border-primary)]" />
+        <div className="flex-1 text-center">
+          <p className="text-xs text-[var(--text-tertiary)]">Max DD</p>
+          <p className="font-semibold font-mono text-[var(--accent-red)]">-{trader.maxDrawdown}%</p>
         </div>
       </div>
 
-      {/* Markets & Followers */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-1 flex-wrap">
+      {/* Markets & Copiers */}
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex gap-1.5 flex-wrap">
           {trader.preferredMarkets.slice(0, 3).map((market) => (
-            <span key={market} className="px-2 py-0.5 rounded text-xs bg-[var(--background)]">
+            <span key={market} className="px-2 py-1 rounded-md text-xs font-medium bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-secondary)]">
               {market}
             </span>
           ))}
           {trader.preferredMarkets.length > 3 && (
-            <span className="px-2 py-0.5 rounded text-xs bg-[var(--background)] text-[var(--muted)]">
+            <span className="px-2 py-1 rounded-md text-xs font-medium bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]">
               +{trader.preferredMarkets.length - 3}
             </span>
           )}
         </div>
-        <div className="text-right text-sm">
-          <span className="text-[var(--muted)]">{formatNumber(trader.copiers)} copiers</span>
+        <div className="text-right text-sm text-[var(--text-tertiary)]">
+          <span className="font-medium text-[var(--text-primary)]">{formatNumber(trader.copiers)}</span> copiers
         </div>
       </div>
 
       {/* Follow Button */}
       <button
         onClick={() => onFollow(trader)}
-        className={`w-full py-3 rounded-lg font-medium transition-all ${
+        className={`w-full py-3.5 rounded-xl font-semibold transition-all ${
           isFollowing
-            ? 'bg-red-600/20 text-red-400 border border-red-600/50 hover:bg-red-600/30'
-            : 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500'
+            ? 'bg-[var(--accent-red)]/10 text-[var(--accent-red)] border border-[var(--accent-red)]/30 hover:bg-[var(--accent-red)]/20'
+            : 'copy-btn'
         }`}
       >
-        {isFollowing ? 'Unfollow' : 'Copy Trader'}
+        {isFollowing ? 'Stop Copying' : 'Copy Trader'}
       </button>
     </div>
   );
@@ -359,33 +358,33 @@ function CopySettingsModal({
   if (!isOpen || !trader) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl max-w-md w-full p-6">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Copy Settings</h2>
-          <button onClick={onClose} className="text-[var(--muted)] hover:text-white">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <h2 className="text-xl font-bold">Copy Settings</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition-colors text-[var(--text-tertiary)] hover:text-[var(--text-primary)]">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="flex items-center gap-3 mb-6 p-3 rounded-lg bg-[var(--background)]">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center font-bold">
+        <div className="flex items-center gap-3 mb-6 p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-cyan)] to-[var(--accent-purple)] flex items-center justify-center font-bold text-lg text-[var(--bg-primary)]">
             {trader.displayName.charAt(0)}
           </div>
           <div>
-            <p className="font-medium">{trader.displayName}</p>
-            <p className="text-sm text-[var(--muted)]">{formatPercent(trader.totalPnlPercent)} all-time</p>
+            <p className="font-semibold">{trader.displayName}</p>
+            <p className="text-sm text-[var(--accent-green)] font-mono">{formatPercent(trader.totalPnlPercent)} all-time</p>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Copy Ratio */}
           <div>
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-[var(--muted)]">Copy Ratio</span>
-              <span className="font-medium">{settings.copyRatio}%</span>
+              <span className="text-[var(--text-secondary)]">Copy Ratio</span>
+              <span className="font-semibold text-[var(--accent-cyan)]">{settings.copyRatio}%</span>
             </div>
             <input
               type="range"
@@ -393,29 +392,29 @@ function CopySettingsModal({
               max="100"
               value={settings.copyRatio}
               onChange={(e) => setSettings({ ...settings, copyRatio: parseInt(e.target.value) })}
-              className="w-full accent-violet-500"
+              className="w-full"
             />
-            <p className="text-xs text-[var(--muted)] mt-1">
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">
               Copy {settings.copyRatio}% of each trade size
             </p>
           </div>
 
           {/* Max Position Size */}
           <div>
-            <label className="text-sm text-[var(--muted)] mb-1 block">Max Position Size (USD)</label>
+            <label className="text-sm text-[var(--text-secondary)] mb-2 block">Max Position Size (USD)</label>
             <input
               type="number"
               value={settings.maxPositionSize}
               onChange={(e) => setSettings({ ...settings, maxPositionSize: parseInt(e.target.value) })}
-              className="w-full p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
+              className="input-field"
             />
           </div>
 
           {/* Max Leverage */}
           <div>
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-[var(--muted)]">Max Leverage</span>
-              <span className="font-medium">{settings.maxLeverage}x</span>
+              <span className="text-[var(--text-secondary)]">Max Leverage</span>
+              <span className="font-semibold text-[var(--accent-cyan)]">{settings.maxLeverage}x</span>
             </div>
             <input
               type="range"
@@ -423,18 +422,17 @@ function CopySettingsModal({
               max="50"
               value={settings.maxLeverage}
               onChange={(e) => setSettings({ ...settings, maxLeverage: parseInt(e.target.value) })}
-              className="w-full accent-violet-500"
+              className="w-full"
             />
           </div>
 
           {/* Trade Types */}
-          <div className="flex gap-4">
+          <div className="flex gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={settings.copyLongs}
                 onChange={(e) => setSettings({ ...settings, copyLongs: e.target.checked })}
-                className="w-4 h-4 accent-violet-500"
               />
               <span className="text-sm">Copy Longs</span>
             </label>
@@ -443,7 +441,6 @@ function CopySettingsModal({
                 type="checkbox"
                 checked={settings.copyShorts}
                 onChange={(e) => setSettings({ ...settings, copyShorts: e.target.checked })}
-                className="w-4 h-4 accent-violet-500"
               />
               <span className="text-sm">Copy Shorts</span>
             </label>
@@ -451,12 +448,12 @@ function CopySettingsModal({
 
           {/* Stop Loss */}
           <div>
-            <label className="text-sm text-[var(--muted)] mb-1 block">Stop copying on drawdown (%)</label>
+            <label className="text-sm text-[var(--text-secondary)] mb-2 block">Stop copying on drawdown (%)</label>
             <input
               type="number"
               value={settings.stopOnDrawdown}
               onChange={(e) => setSettings({ ...settings, stopOnDrawdown: parseInt(e.target.value) })}
-              className="w-full p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
+              className="input-field"
             />
           </div>
         </div>
@@ -464,13 +461,13 @@ function CopySettingsModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-lg font-medium border border-[var(--border)] hover:bg-[var(--background)] transition-colors"
+            className="flex-1 btn-secondary"
           >
             Cancel
           </button>
           <button
             onClick={() => onConfirm(settings)}
-            className="flex-1 py-3 rounded-lg font-medium bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 transition-all"
+            className="flex-1 copy-btn"
           >
             Start Copying
           </button>
@@ -480,13 +477,13 @@ function CopySettingsModal({
   );
 }
 
-function FollowedTraderRow({ 
-  trader, 
+function FollowedTraderRow({
+  trader,
   copyRatio,
   totalCopied,
   pnl,
   onUnfollow,
-}: { 
+}: {
   trader: Trader;
   copyRatio: number;
   totalCopied: number;
@@ -494,25 +491,25 @@ function FollowedTraderRow({
   onUnfollow: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-4 border-b border-[var(--border)] last:border-0">
+    <div className="flex items-center justify-between py-4 border-b border-[var(--border-primary)] last:border-0">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center font-bold">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent-cyan)]/20 to-[var(--accent-purple)]/20 border border-[var(--border-primary)] flex items-center justify-center font-bold text-[var(--accent-cyan)]">
           {trader.displayName.charAt(0)}
         </div>
         <div>
           <p className="font-medium">{trader.displayName}</p>
-          <p className="text-sm text-[var(--muted)]">{copyRatio}% copy ratio</p>
+          <p className="text-xs text-[var(--text-tertiary)]">{copyRatio}% copy ratio</p>
         </div>
       </div>
       <div className="text-right">
-        <p className={`font-medium ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        <p className={`font-semibold font-mono ${pnl >= 0 ? 'text-[var(--accent-green)]' : 'text-[var(--accent-red)]'}`}>
           {pnl >= 0 ? '+' : ''}{formatCurrency(pnl)}
         </p>
-        <p className="text-sm text-[var(--muted)]">{formatCurrency(totalCopied)} copied</p>
+        <p className="text-xs text-[var(--text-tertiary)]">{formatCurrency(totalCopied)} copied</p>
       </div>
       <button
         onClick={onUnfollow}
-        className="ml-4 px-3 py-1 text-sm rounded border border-red-600/50 text-red-400 hover:bg-red-600/20 transition-colors"
+        className="ml-4 px-3 py-1.5 text-sm rounded-lg border border-[var(--accent-red)]/30 text-[var(--accent-red)] hover:bg-[var(--accent-red)]/10 transition-colors"
       >
         Stop
       </button>
@@ -527,14 +524,14 @@ function FollowedTraderRow({
 export default function CopyTradingPage() {
   const data = useAppData();
   const { execute } = useAppActions();
-  
+
   const [sortBy, setSortBy] = useState<'pnl' | 'winRate' | 'copiers' | 'sharpe'>('pnl');
   const [filterStyle, setFilterStyle] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrader, setSelectedTrader] = useState<Trader | null>(null);
   const [showModal, setShowModal] = useState(false);
-  
-  const { wallet, copyTrading } = data;
+
+  const { wallet = { connected: false }, copyTrading = { followedTraders: [] } } = data;
 
   // Get list of followed trader IDs
   const followedIds = copyTrading.followedTraders.map(t => t.traderId);
@@ -542,7 +539,7 @@ export default function CopyTradingPage() {
   // Sort and filter traders
   const sortedTraders = [...TOP_TRADERS]
     .filter(t => filterStyle === 'all' || t.tradingStyle === filterStyle)
-    .filter(t => 
+    .filter(t =>
       t.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.walletAddress.toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -558,13 +555,11 @@ export default function CopyTradingPage() {
 
   const handleFollowClick = (trader: Trader) => {
     if (followedIds.includes(trader.id)) {
-      // Unfollow
       execute({
         type: 'unfollowTrader',
         traderId: trader.id,
       });
     } else {
-      // Open settings modal
       setSelectedTrader(trader);
       setShowModal(true);
     }
@@ -572,7 +567,7 @@ export default function CopyTradingPage() {
 
   const handleConfirmFollow = (settings: CopySettings) => {
     if (!selectedTrader) return;
-    
+
     execute({
       type: 'followTrader',
       traderId: selectedTrader.id,
@@ -580,73 +575,50 @@ export default function CopyTradingPage() {
       displayName: selectedTrader.displayName,
       ...settings,
     });
-    
+
     setShowModal(false);
     setSelectedTrader(null);
   };
 
-  const handleConnectWallet = () => {
-    execute({ type: 'connectWallet' });
-  };
-
   return (
     <main className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[var(--card)]/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-2xl">🦞</span>
-              <span className="font-bold">OpenClawDex</span>
-            </Link>
-          </div>
-          
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-[var(--muted)] hover:text-white transition-colors">Dashboard</Link>
-            <Link href="/trade" className="text-[var(--muted)] hover:text-white transition-colors">Trade</Link>
-            <Link href="/copy" className="text-violet-400 font-medium">Copy</Link>
-            <Link href="/leaderboard" className="text-[var(--muted)] hover:text-white transition-colors">Leaderboard</Link>
-          </nav>
+      {/* Background Effects */}
+      <div className="neural-grid" />
+      <div className="neural-orbs" />
 
-          {wallet.connected ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)]">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm font-mono">{shortenAddress(wallet.address || '')}</span>
+      <Header />
+
+      {/* Hero Section */}
+      <section className="page-hero border-b border-[var(--border-primary)]">
+        <div className="relative max-w-[1400px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-primary)] mb-4">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--accent-cyan)]">
+                  <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="19" cy="11" r="2"/><path d="M19 8v6m-3-3h6"/>
+                </svg>
+                <span className="text-xs font-medium text-[var(--text-secondary)]">Strategy Replication</span>
+              </div>
+
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                <span className="gradient-text">Copy Trading</span>
+              </h1>
+              <p className="text-[var(--text-secondary)] max-w-lg">
+                Follow top AI trading agents and automatically replicate their strategies on Hyperliquid.
+              </p>
             </div>
-          ) : (
-            <button 
-              onClick={handleConnectWallet}
-              className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-medium text-sm transition-all"
-            >
-              Connect
-            </button>
-          )}
-        </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">👥 Copy Trading</h1>
-          <p className="text-[var(--muted)]">
-            Follow top traders and automatically copy their trades on Hyperliquid
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3">
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-4 mb-6">
-              <div className="relative flex-1 min-w-[200px]">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search traders..."
-                  className="w-full pl-10 pr-4 py-2 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
+                  className="pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl text-sm focus:outline-none focus:border-[var(--accent-cyan)] w-48 transition-colors"
                 />
-                <svg className="w-5 h-5 absolute left-3 top-2.5 text-[var(--muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 absolute left-3.5 top-3 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -654,18 +626,16 @@ export default function CopyTradingPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="px-4 py-2 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
               >
                 <option value="pnl">Sort by PnL</option>
                 <option value="winRate">Sort by Win Rate</option>
                 <option value="copiers">Sort by Copiers</option>
-                <option value="sharpe">Sort by Sharpe Ratio</option>
+                <option value="sharpe">Sort by Sharpe</option>
               </select>
 
               <select
                 value={filterStyle}
                 onChange={(e) => setFilterStyle(e.target.value)}
-                className="px-4 py-2 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-violet-500"
               >
                 <option value="all">All Styles</option>
                 <option value="scalper">Scalper</option>
@@ -674,123 +644,147 @@ export default function CopyTradingPage() {
                 <option value="mixed">Mixed</option>
               </select>
             </div>
+          </div>
+        </div>
+      </section>
 
+      <div className="max-w-[1400px] mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-3">
             {/* Trader Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {sortedTraders.map((trader) => (
+              {sortedTraders.map((trader, idx) => (
                 <TraderCard
                   key={trader.id}
                   trader={trader}
                   onFollow={handleFollowClick}
                   isFollowing={followedIds.includes(trader.id)}
+                  index={idx}
                 />
               ))}
             </div>
 
             {sortedTraders.length === 0 && (
-              <div className="text-center py-12 text-[var(--muted)]">
-                <p className="text-4xl mb-2">🔍</p>
-                <p>No traders found matching your criteria</p>
+              <div className="text-center py-16">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center mx-auto mb-4">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--text-tertiary)]">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  </svg>
+                </div>
+                <p className="text-[var(--text-tertiary)]">No traders found matching your criteria</p>
               </div>
             )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Your Copy Trading Stats */}
-            <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-              <h2 className="text-lg font-semibold mb-4">Your Copy Trading</h2>
-              
-              {wallet.connected ? (
-                <>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="p-3 rounded-lg bg-[var(--background)]">
-                      <p className="text-xs text-[var(--muted)]">Following</p>
-                      <p className="text-xl font-bold">{copyTrading.followedTraders.length}</p>
+            <div className="sticky top-24 space-y-6">
+              {/* Your Copy Trading Stats */}
+              <div className="glass-card-strong p-6">
+                <h2 className="text-lg font-semibold flex items-center gap-2 mb-5">
+                  <span className="w-1 h-5 rounded-full bg-[var(--accent-purple)]" />
+                  Your Copy Trading
+                </h2>
+
+                {wallet.connected ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 mb-5">
+                      <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+                        <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">Following</p>
+                        <p className="text-2xl font-bold font-mono">{copyTrading.followedTraders.length}</p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+                        <p className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">Total PnL</p>
+                        <p className={`text-2xl font-bold font-mono ${
+                          copyTrading.followedTraders.reduce((sum, t) => sum + t.totalPnl, 0) >= 0
+                            ? 'text-[var(--accent-green)]'
+                            : 'text-[var(--accent-red)]'
+                        }`}>
+                          {formatCurrency(copyTrading.followedTraders.reduce((sum, t) => sum + t.totalPnl, 0))}
+                        </p>
+                      </div>
                     </div>
-                    <div className="p-3 rounded-lg bg-[var(--background)]">
-                      <p className="text-xs text-[var(--muted)]">Total PnL</p>
-                      <p className={`text-xl font-bold ${
-                        copyTrading.followedTraders.reduce((sum, t) => sum + t.totalPnl, 0) >= 0 
-                          ? 'text-green-400' 
-                          : 'text-red-400'
-                      }`}>
-                        {formatCurrency(copyTrading.followedTraders.reduce((sum, t) => sum + t.totalPnl, 0))}
-                      </p>
+
+                    {copyTrading.followedTraders.length > 0 ? (
+                      <div>
+                        <h3 className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-3">Active Copies</h3>
+                        {copyTrading.followedTraders.map((followed) => {
+                          const traderData = TOP_TRADERS.find(t => t.id === followed.traderId);
+                          if (!traderData) return null;
+                          return (
+                            <FollowedTraderRow
+                              key={followed.traderId}
+                              trader={traderData}
+                              copyRatio={followed.copyRatio}
+                              totalCopied={followed.totalCopied}
+                              pnl={followed.totalPnl}
+                              onUnfollow={() => execute({ type: 'unfollowTrader', traderId: followed.traderId })}
+                            />
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-[var(--text-tertiary)]">
+                        <p className="mb-1">No active copies</p>
+                        <p className="text-sm">Start following traders to copy their trades</p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center mx-auto mb-4">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--text-tertiary)]">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+                      </svg>
                     </div>
+                    <p className="text-[var(--text-secondary)] mb-4">Connect wallet to start copy trading</p>
+                    <button
+                      onClick={() => execute({ type: 'connectWallet' })}
+                      className="btn-primary w-full"
+                    >
+                      Connect Wallet
+                    </button>
                   </div>
+                )}
+              </div>
 
-                  {copyTrading.followedTraders.length > 0 ? (
-                    <div>
-                      <h3 className="text-sm font-medium text-[var(--muted)] mb-2">Active Copies</h3>
-                      {copyTrading.followedTraders.map((followed) => {
-                        const traderData = TOP_TRADERS.find(t => t.id === followed.traderId);
-                        if (!traderData) return null;
-                        return (
-                          <FollowedTraderRow
-                            key={followed.traderId}
-                            trader={traderData}
-                            copyRatio={followed.copyRatio}
-                            totalCopied={followed.totalCopied}
-                            pnl={followed.totalPnl}
-                            onUnfollow={() => execute({ type: 'unfollowTrader', traderId: followed.traderId })}
-                          />
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4 text-[var(--muted)]">
-                      <p>No active copies</p>
-                      <p className="text-sm mt-1">Start following traders to copy their trades</p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-6">
-                  <p className="text-[var(--muted)] mb-4">Connect wallet to start copy trading</p>
-                  <button
-                    onClick={handleConnectWallet}
-                    className="px-6 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-medium text-sm transition-all"
-                  >
-                    Connect Wallet
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* How It Works */}
-            <div className="p-6 rounded-xl border border-[var(--border)] bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10">
-              <h2 className="text-lg font-semibold mb-4">How Copy Trading Works</h2>
-              <div className="space-y-3 text-sm">
-                <div className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                  <p className="text-[var(--muted)]">Browse top traders and review their performance stats</p>
-                </div>
-                <div className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                  <p className="text-[var(--muted)]">Set your copy ratio, max position size, and risk limits</p>
-                </div>
-                <div className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                  <p className="text-[var(--muted)]">Trades are automatically copied to your account on Hyperliquid</p>
-                </div>
-                <div className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
-                  <p className="text-[var(--muted)]">Monitor performance and adjust settings anytime</p>
+              {/* How It Works */}
+              <div className="relative overflow-hidden rounded-xl border border-[var(--border-primary)] p-6">
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-cyan)]/5 via-transparent to-[var(--accent-purple)]/5" />
+                <div className="relative">
+                  <h2 className="font-semibold mb-4 flex items-center gap-2">
+                    <span className="w-1 h-5 rounded-full bg-[var(--accent-cyan)]" />
+                    How It Works
+                  </h2>
+                  <div className="space-y-4 text-sm">
+                    {[
+                      { step: 1, text: 'Browse top traders and review their performance stats' },
+                      { step: 2, text: 'Set your copy ratio, max position size, and risk limits' },
+                      { step: 3, text: 'Trades are automatically copied to your account' },
+                      { step: 4, text: 'Monitor performance and adjust settings anytime' },
+                    ].map(({ step, text }) => (
+                      <div key={step} className="flex gap-3">
+                        <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[var(--accent-cyan)] to-[var(--accent-purple)] flex items-center justify-center text-xs font-bold text-[var(--bg-primary)] flex-shrink-0">
+                          {step}
+                        </span>
+                        <p className="text-[var(--text-secondary)] pt-1">{text}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Risk Warning */}
-            <div className="p-4 rounded-lg border border-yellow-600/50 bg-yellow-600/10">
-              <div className="flex gap-2">
-                <span className="text-yellow-400">⚠️</span>
-                <div className="text-sm">
-                  <p className="font-medium text-yellow-400 mb-1">Risk Warning</p>
-                  <p className="text-[var(--muted)]">
-                    Past performance does not guarantee future results. 
-                    Copy trading involves risk of loss. Only trade with funds you can afford to lose.
-                  </p>
+              {/* Risk Warning */}
+              <div className="p-4 rounded-xl border border-[var(--accent-orange)]/30 bg-[var(--accent-orange)]/5">
+                <div className="flex gap-3">
+                  <span className="text-[var(--accent-orange)] text-xl">⚠️</span>
+                  <div className="text-sm">
+                    <p className="font-semibold text-[var(--accent-orange)] mb-1">Risk Warning</p>
+                    <p className="text-[var(--text-secondary)]">
+                      Past performance does not guarantee future results. Copy trading involves risk of loss.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

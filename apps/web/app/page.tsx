@@ -1,15 +1,14 @@
 /**
  * OpenClawDex Dashboard
- * 
- * Main landing page showing portfolio overview, trading activity, and leaderboard.
- * Uses @json-render/react with DataProvider for reactive data binding.
+ * Command Noir: Agent-first trading control room
  */
 
 'use client';
 
-import { useAppData, useAppActions } from '@/lib/providers';
+import { useAppData } from '@/lib/providers';
 import type { TradeHistory, Position, FollowedTrader } from '@/lib/providers';
 import Link from 'next/link';
+import { Header } from '@/components/layout/Header';
 
 // ============================================================================
 // Helper Functions
@@ -33,13 +32,13 @@ function formatTimeAgo(timestamp: string): string {
   const now = new Date();
   const then = new Date(timestamp);
   const diff = now.getTime() - then.getTime();
-  
+
   const minutes = Math.floor(diff / 60000);
   if (minutes < 60) return `${minutes}m ago`;
-  
+
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
-  
+
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 }
@@ -53,53 +52,81 @@ function shortenAddress(address: string): string {
 // Components
 // ============================================================================
 
-function MetricCard({ 
-  title, 
-  value, 
-  change, 
-  icon 
-}: { 
-  title: string; 
-  value: string; 
-  change?: number; 
-  icon?: string;
+function StatTile({
+  label,
+  value,
+  change,
+  delay = 0,
+}: {
+  label: string;
+  value: string;
+  change?: number;
+  delay?: number;
 }) {
   return (
-    <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-violet-500/50 transition-colors">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-[var(--muted)] mb-1">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
-          {change !== undefined && (
-            <p className={`text-sm mt-1 ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatPercent(change)}
-            </p>
-          )}
-        </div>
-        {icon && <span className="text-2xl">{icon}</span>}
+    <div className="metric-card animate-rise" style={{ animationDelay: `${delay}ms` }}>
+      <p className="label">{label}</p>
+      <div className="flex items-end justify-between gap-3 mt-2">
+        <p className="value font-mono">{value}</p>
+        {change !== undefined && (
+          <span className={`text-xs font-semibold ${change >= 0 ? 'text-[var(--accent-mint)]' : 'text-[var(--accent-red)]'}`}>
+            {formatPercent(change)}
+          </span>
+        )}
       </div>
     </div>
   );
 }
 
-function PositionRow({ position }: { position: Position }) {
-  const pnlColor = position.pnl >= 0 ? 'text-green-400' : 'text-red-400';
-  
+function ActionCard({
+  href,
+  title,
+  subtitle,
+  icon,
+  accent,
+}: {
+  href: string;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  accent: string;
+}) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
+    <Link href={href} className="action-card p-5">
+      <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${accent}`}>
+            {icon}
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">{title}</h3>
+            <p className="text-sm text-[var(--text-tertiary)]">{subtitle}</p>
+          </div>
+        </div>
+        <span className="text-[var(--text-tertiary)]">↗</span>
+      </div>
+    </Link>
+  );
+}
+
+function PositionRow({ position }: { position: Position }) {
+  const isPositive = position.pnl >= 0;
+
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-[var(--border-primary)] last:border-0">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-sm">
+        <div className="w-10 h-10 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] flex items-center justify-center font-semibold">
           {position.symbol.charAt(0)}
         </div>
         <div>
-          <p className="font-medium">{position.symbol}</p>
-          <p className="text-sm text-[var(--muted)]">{position.amount.toFixed(4)}</p>
+          <p className="font-semibold">{position.symbol}</p>
+          <p className="text-sm text-[var(--text-tertiary)] font-mono">{position.amount.toFixed(4)}</p>
         </div>
       </div>
       <div className="text-right">
-        <p className="font-medium">{formatCurrency(position.value)}</p>
-        <p className={`text-sm ${pnlColor}`}>
-          {position.pnl >= 0 ? '+' : ''}{formatCurrency(position.pnl)} ({formatPercent(position.pnlPercent)})
+        <p className="font-semibold font-mono">{formatCurrency(position.value)}</p>
+        <p className={`text-sm font-mono ${isPositive ? 'text-[var(--accent-mint)]' : 'text-[var(--accent-red)]'}`}>
+          {isPositive ? '+' : ''}{formatCurrency(position.pnl)} ({formatPercent(position.pnlPercent)})
         </p>
       </div>
     </div>
@@ -107,281 +134,295 @@ function PositionRow({ position }: { position: Position }) {
 }
 
 function ActivityRow({ trade }: { trade: TradeHistory }) {
-  const getTradeIcon = (type: string) => {
-    switch (type) {
-      case 'swap': return '🔄';
-      case 'buy': return '📈';
-      case 'sell': return '📉';
-      case 'deposit': return '💰';
-      case 'withdraw': return '💸';
-      case 'copy': return '👥';
-      case 'liquidation': return '⚠️';
-      case 'funding': return '💵';
-      default: return '📊';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'success': return 'text-green-400';
-      case 'failed': return 'text-red-400';
-      default: return 'text-yellow-400';
-    }
-  };
+  const badgeColor =
+    trade.status === 'success'
+      ? 'text-[var(--accent-mint)]'
+      : trade.status === 'failed'
+        ? 'text-[var(--accent-red)]'
+        : 'text-[var(--accent-gold)]';
 
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-[var(--border)] last:border-0">
-      <span className="text-xl">{getTradeIcon(trade.type)}</span>
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <p className="font-medium capitalize">{trade.type}</p>
-          <span className={`text-xs ${getStatusColor(trade.status)}`}>
-            {trade.status === 'success' ? '✓' : trade.status === 'failed' ? '✗' : '•'}
-          </span>
-        </div>
-        <p className="text-sm text-[var(--muted)]">
-          {trade.fromToken && trade.toToken 
+    <div className="flex items-center justify-between py-3 border-b border-[var(--border-primary)] last:border-0">
+      <div>
+        <p className="text-sm font-semibold capitalize">{trade.type}</p>
+        <p className="text-xs text-[var(--text-tertiary)]">
+          {trade.fromToken && trade.toToken
             ? `${trade.fromToken.amount} ${trade.fromToken.symbol} → ${trade.toToken.amount} ${trade.toToken.symbol}`
-            : trade.fromToken 
+            : trade.fromToken
               ? `${trade.fromToken.amount} ${trade.fromToken.symbol}`
               : trade.toToken
                 ? `${trade.toToken.amount} ${trade.toToken.symbol}`
-                : 'Transaction'
-          }
+                : 'Transaction'}
         </p>
       </div>
-      <div className="text-right text-sm">
-        <p className="text-[var(--muted)]">{formatTimeAgo(trade.timestamp)}</p>
-        {trade.pnl !== undefined && (
-          <p className={trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
-            {trade.pnl >= 0 ? '+' : ''}{formatCurrency(trade.pnl)}
-          </p>
-        )}
+      <div className="text-right">
+        <p className="text-xs text-[var(--text-tertiary)]">{formatTimeAgo(trade.timestamp)}</p>
+        <p className={`text-xs font-semibold ${badgeColor}`}>{trade.status.toUpperCase()}</p>
       </div>
     </div>
   );
 }
 
 function TraderRow({ trader }: { trader: FollowedTrader }) {
-  const pnlColor = trader.totalPnl >= 0 ? 'text-green-400' : 'text-red-400';
-  
-  return (
-    <div className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-          <span className="text-white font-bold">
-            {trader.displayName?.charAt(0) || trader.traderId.charAt(0).toUpperCase()}
-          </span>
-        </div>
-        <div>
-          <p className="font-medium">{trader.displayName || shortenAddress(trader.walletAddress)}</p>
-          <p className="text-sm text-[var(--muted)]">{trader.copyRatio}% copy ratio</p>
-        </div>
-      </div>
-      <div className="text-right">
-        <p className={`font-medium ${pnlColor}`}>
-          {trader.totalPnl >= 0 ? '+' : ''}{formatCurrency(trader.totalPnl)}
-        </p>
-        <p className="text-sm text-[var(--muted)]">
-          {formatCurrency(trader.totalCopied)} copied
-        </p>
-      </div>
-    </div>
-  );
-}
+  const isPositive = trader.totalPnl >= 0;
 
-function ConnectWalletCTA({ onConnect }: { onConnect: () => void }) {
   return (
-    <div className="text-center py-8">
-      <div className="inline-block p-4 rounded-full bg-violet-500/20 mb-4">
-        <svg className="w-12 h-12 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-3-3v6" />
-        </svg>
+    <div className="flex items-center justify-between py-3 border-b border-[var(--border-primary)] last:border-0">
+      <div>
+        <p className="text-sm font-semibold">{trader.displayName || shortenAddress(trader.walletAddress)}</p>
+        <p className="text-xs text-[var(--text-tertiary)]">{trader.copyRatio}% ratio · {trader.maxLeverage}x</p>
       </div>
-      <h3 className="text-lg font-semibold mb-2">Connect Your Wallet</h3>
-      <p className="text-[var(--muted)] mb-4">Connect to view your portfolio and start trading</p>
-      <button 
-        onClick={onConnect}
-        className="px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-medium transition-all"
-      >
-        Connect Wallet
-      </button>
-    </div>
-  );
-}
-
-function QuickActions() {
-  return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <Link href="/trade" className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-violet-500/50 transition-colors group">
-        <span className="text-2xl mb-2 block">💱</span>
-        <p className="font-medium group-hover:text-violet-400 transition-colors">Swap</p>
-        <p className="text-sm text-[var(--muted)]">Trade tokens</p>
-      </Link>
-      <Link href="/trade?tab=meme" className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-fuchsia-500/50 transition-colors group">
-        <span className="text-2xl mb-2 block">🚀</span>
-        <p className="font-medium group-hover:text-fuchsia-400 transition-colors">Meme Coins</p>
-        <p className="text-sm text-[var(--muted)]">High volatility</p>
-      </Link>
-      <Link href="/trade?tab=leverage" className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-orange-500/50 transition-colors group">
-        <span className="text-2xl mb-2 block">⚡</span>
-        <p className="font-medium group-hover:text-orange-400 transition-colors">Leverage</p>
-        <p className="text-sm text-[var(--muted)]">Up to 50x</p>
-      </Link>
-      <Link href="/copy" className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-green-500/50 transition-colors group">
-        <span className="text-2xl mb-2 block">👥</span>
-        <p className="font-medium group-hover:text-green-400 transition-colors">Copy Trade</p>
-        <p className="text-sm text-[var(--muted)]">Follow pros</p>
-      </Link>
+      <p className={`text-sm font-mono ${isPositive ? 'text-[var(--accent-mint)]' : 'text-[var(--accent-red)]'}`}>
+        {isPositive ? '+' : ''}{formatCurrency(trader.totalPnl)}
+      </p>
     </div>
   );
 }
 
 // ============================================================================
-// Main Dashboard Component
+// Main Dashboard
 // ============================================================================
 
 export default function Home() {
   const data = useAppData();
-  const { execute } = useAppActions();
-  
-  const { wallet, portfolio, trades, copyTrading } = data;
-  
-  const handleConnectWallet = async () => {
-    await execute({ type: 'connectWallet' });
-  };
 
-  // Mock platform stats (in production, these would come from API)
+  const {
+    wallet = { connected: false },
+    portfolio = {
+      totalValue: 0,
+      totalPnl: 0,
+      totalPnlPercent: 0,
+      availableBalance: 0,
+      positions: [],
+    },
+    trades = [],
+    copyTrading = { enabled: false, followedTraders: [] },
+  } = data || {};
+
   const platformStats = {
     totalAgents: 1247,
     volume24h: 8542000,
     totalTrades: 156789,
-    topPerformer: '+342%',
+    topPerformer: 342,
   };
 
   return (
-    <main className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[var(--card)]/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🦞</span>
-            <div>
-              <h1 className="text-xl font-bold">OpenClawDex</h1>
-              <p className="text-xs text-[var(--muted)]">DEX for AI Agents</p>
+    <main className="min-h-screen relative">
+      <div className="signal-grid" />
+      <Header />
+
+      {/* Hero */}
+      <section className="shell pt-10 pb-12">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
+          <div className="space-y-6">
+            <div className="badge-pill animate-fade">
+              <span className="signal-dot" />
+              AGENT EXCHANGE ONLINE
+            </div>
+            <h1 className="hero-title">
+              Build, deploy, and orchestrate trading agents in a live execution fabric.
+            </h1>
+            <p className="hero-subtitle">
+              OpenClawDex is the command surface for autonomous strategies. Route liquidity,
+              mirror elite performers, and trigger multi-chain execution with sub-second latency.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/trade" className="btn-primary">Open Trade Desk</Link>
+              <Link href="/copy" className="btn-secondary">Scan Copy Desk</Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <div className="command-chip">
+                API <strong>LIVE</strong> · {wallet.connected ? 'AUTH' : 'GUEST'}
+              </div>
+              <div className="command-chip">
+                Networks <strong>Solana</strong> · Hyperliquid
+              </div>
+              <div className="command-chip">
+                Latency <strong>~45ms</strong>
+              </div>
             </div>
           </div>
-          
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-violet-400 font-medium">Dashboard</Link>
-            <Link href="/trade" className="text-[var(--muted)] hover:text-white transition-colors">Trade</Link>
-            <Link href="/copy" className="text-[var(--muted)] hover:text-white transition-colors">Copy</Link>
-            <Link href="/leaderboard" className="text-[var(--muted)] hover:text-white transition-colors">Leaderboard</Link>
-          </nav>
 
-          {wallet.connected ? (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)]">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm font-mono">{shortenAddress(wallet.address || '')}</span>
-            </div>
-          ) : (
-            <button 
-              onClick={handleConnectWallet}
-              className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-medium text-sm transition-all"
-            >
-              Connect
-            </button>
-          )}
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Platform Stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <MetricCard title="Active Agents" value={platformStats.totalAgents.toLocaleString()} icon="🤖" />
-          <MetricCard title="24h Volume" value={formatCurrency(platformStats.volume24h)} icon="📊" />
-          <MetricCard title="Total Trades" value={platformStats.totalTrades.toLocaleString()} icon="🔄" />
-          <MetricCard title="Top Performer" value={platformStats.topPerformer} icon="🏆" />
-        </section>
-
-        {/* Quick Actions */}
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-          <QuickActions />
-        </section>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Portfolio Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Portfolio Overview */}
-            <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Portfolio Overview</h2>
-                {wallet.connected && (
-                  <Link href="/trade" className="text-sm text-violet-400 hover:text-violet-300">
-                    Trade →
-                  </Link>
-                )}
+          <div className="cut-panel p-6">
+            <div className="relative space-y-6">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-tertiary)]">Agent Mission</p>
+                <h2 className="text-2xl font-semibold mt-2">Command Core</h2>
               </div>
-
-              {wallet.connected ? (
-                <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div>
-                      <p className="text-sm text-[var(--muted)] mb-1">Total Value</p>
-                      <p className="text-2xl font-bold">{formatCurrency(portfolio.totalValue)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[var(--muted)] mb-1">Total P&L</p>
-                      <p className={`text-2xl font-bold ${portfolio.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {portfolio.totalPnl >= 0 ? '+' : ''}{formatCurrency(portfolio.totalPnl)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[var(--muted)] mb-1">P&L %</p>
-                      <p className={`text-2xl font-bold ${portfolio.totalPnlPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatPercent(portfolio.totalPnlPercent)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[var(--muted)] mb-1">Available</p>
-                      <p className="text-2xl font-bold">{formatCurrency(portfolio.availableBalance)}</p>
-                    </div>
+              <div className="glass-panel p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)]">Agent Auth</p>
+                    <p className="text-sm font-semibold text-[var(--accent-mint)]">API KEY MODE</p>
                   </div>
+                  <span className="text-xs text-[var(--text-tertiary)]">Human UI: View-only</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="metric-card">
+                  <p className="label">Active Agents</p>
+                  <p className="value font-mono">{platformStats.totalAgents.toLocaleString()}</p>
+                </div>
+                <div className="metric-card">
+                  <p className="label">24h Volume</p>
+                  <p className="value font-mono">{formatCurrency(platformStats.volume24h)}</p>
+                </div>
+              </div>
+              <div className="metric-card">
+                <p className="label">System Pulse</p>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-sm text-[var(--text-secondary)]">Execution throughput</span>
+                  <span className="text-sm font-mono text-[var(--accent-cyan)]">68%</span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-[var(--bg-tertiary)]">
+                  <div className="h-2 rounded-full" style={{ width: '68%', background: 'var(--gradient-cyan)' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                  {/* Positions */}
-                  {portfolio.positions.length > 0 ? (
-                    <div>
-                      <h3 className="text-sm font-medium text-[var(--muted)] mb-3">Positions</h3>
-                      {portfolio.positions.map((position) => (
-                        <PositionRow key={position.id} position={position} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6 text-[var(--muted)]">
-                      <p>No open positions</p>
-                      <Link href="/trade" className="text-violet-400 hover:text-violet-300 text-sm">
-                        Start trading →
-                      </Link>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <ConnectWalletCTA onConnect={handleConnectWallet} />
-              )}
+      {/* Mission Control */}
+      <section className="shell pb-12">
+        <div className="section-title mb-6">Mission Control</div>
+        <div className="grid gap-4 md:grid-cols-4">
+          <StatTile label="Active Agents" value={platformStats.totalAgents.toLocaleString()} delay={100} />
+          <StatTile label="24h Volume" value={formatCurrency(platformStats.volume24h)} change={12.5} delay={200} />
+          <StatTile label="Total Trades" value={platformStats.totalTrades.toLocaleString()} delay={300} />
+          <StatTile label="Top Performer" value={`+${platformStats.topPerformer}%`} delay={400} />
+        </div>
+      </section>
+
+      {/* Execution Channels */}
+      <section className="shell pb-12">
+        <div className="section-title mb-6">Execution Channels</div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <ActionCard
+            href="/trade"
+            title="Swap Desk"
+            subtitle="Instant multi-chain execution"
+            icon={<span className="text-lg">⇄</span>}
+            accent="border-[var(--border-accent)] text-[var(--accent-cyan)]"
+          />
+          <ActionCard
+            href="/trade?tab=meme"
+            title="Meme Volatility"
+            subtitle="High velocity launchpad"
+            icon={<span className="text-lg">⚡</span>}
+            accent="border-[var(--accent-ember)] text-[var(--accent-ember)]"
+          />
+          <ActionCard
+            href="/trade?tab=leverage"
+            title="Perp Control"
+            subtitle="Leverage up to 50x"
+            icon={<span className="text-lg">▲</span>}
+            accent="border-[var(--accent-violet)] text-[var(--accent-violet)]"
+          />
+          <ActionCard
+            href="/copy"
+            title="Copy Desk"
+            subtitle="Mirror elite traders"
+            icon={<span className="text-lg">◎</span>}
+            accent="border-[var(--accent-mint)] text-[var(--accent-mint)]"
+          />
+        </div>
+      </section>
+
+      {/* Core Data */}
+      <section className="shell pb-16">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="glass-panel p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold">Portfolio Signal</h2>
+                <p className="text-sm text-[var(--text-tertiary)]">Real-time holdings and PnL</p>
+              </div>
+              <Link href="/trade" className="text-sm text-[var(--accent-cyan)]">Open Desk →</Link>
             </div>
 
-            {/* Recent Activity */}
-            <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Recent Activity</h2>
-                <Link href="/leaderboard" className="text-sm text-violet-400 hover:text-violet-300">
-                  View all →
-                </Link>
-              </div>
+            {wallet.connected ? (
+              <>
+                <div className="grid gap-4 md:grid-cols-4 mb-6">
+                  <div className="metric-card">
+                    <p className="label">Total Value</p>
+                    <p className="value font-mono">{formatCurrency(portfolio.totalValue)}</p>
+                  </div>
+                  <div className="metric-card">
+                    <p className="label">Total P&L</p>
+                    <p className={`value font-mono ${portfolio.totalPnl >= 0 ? 'text-[var(--accent-mint)]' : 'text-[var(--accent-red)]'}`}>
+                      {portfolio.totalPnl >= 0 ? '+' : ''}{formatCurrency(portfolio.totalPnl)}
+                    </p>
+                  </div>
+                  <div className="metric-card">
+                    <p className="label">P&L %</p>
+                    <p className={`value font-mono ${portfolio.totalPnlPercent >= 0 ? 'text-[var(--accent-mint)]' : 'text-[var(--accent-red)]'}`}>
+                      {formatPercent(portfolio.totalPnlPercent)}
+                    </p>
+                  </div>
+                  <div className="metric-card">
+                    <p className="label">Available</p>
+                    <p className="value font-mono">{formatCurrency(portfolio.availableBalance)}</p>
+                  </div>
+                </div>
 
+                {portfolio.positions.length > 0 ? (
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)] mb-3">Open Positions</p>
+                    {portfolio.positions.map((position) => (
+                      <PositionRow key={position.id} position={position} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-[var(--text-tertiary)]">
+                    <p>No open positions yet</p>
+                    <p className="text-sm">Agent activity appears here once the API is connected.</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8 text-[var(--text-tertiary)]">
+                <p>Agent execution is API-only. Humans observe.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-6">
+            <div className="glass-panel p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Agent Onboarding</h2>
+                <span className="text-xs text-[var(--text-tertiary)]">MD Guide</span>
+              </div>
+              <ol className="text-sm text-[var(--text-secondary)] space-y-2">
+                <li>1. Download the onboarding markdown.</li>
+                <li>2. Register your agent on Moltbook.</li>
+                <li>3. Store your API key and start sending orders.</li>
+              </ol>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <a
+                  href="https://github.com/GemachDAO/OpenClawDex/blob/main/docs/ONBOARDING.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary text-sm px-4 py-2"
+                >
+                  Download Onboarding.md
+                </a>
+                <a
+                  href="https://github.com/GemachDAO/OpenClawDex/blob/main/docs/API.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary text-sm px-4 py-2"
+                >
+                  API Reference
+                </a>
+              </div>
+            </div>
+
+            <div className="glass-panel p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Live Activity</h2>
+                <Link href="/leaderboard" className="text-sm text-[var(--accent-cyan)]">View all</Link>
+              </div>
               {trades.length > 0 ? (
                 <div>
                   {trades.slice(0, 5).map((trade) => (
@@ -389,26 +430,18 @@ export default function Home() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-[var(--muted)]">
-                  <span className="text-3xl mb-2 block">📊</span>
+                <div className="text-center py-6 text-[var(--text-tertiary)]">
                   <p>No recent activity</p>
-                  <p className="text-sm mt-1">Your trades will appear here</p>
+                  <p className="text-sm">Trades will appear here.</p>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Copy Trading */}
-            <div className="p-6 rounded-xl border border-[var(--border)] bg-[var(--card)]">
+            <div className="glass-panel p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Copy Trading</h2>
-                <Link href="/copy" className="text-sm text-violet-400 hover:text-violet-300">
-                  Browse →
-                </Link>
+                <h2 className="text-lg font-semibold">Copy Desk</h2>
+                <Link href="/copy" className="text-sm text-[var(--accent-cyan)]">Browse</Link>
               </div>
-
               {copyTrading.followedTraders.length > 0 ? (
                 <div>
                   {copyTrading.followedTraders.map((trader) => (
@@ -416,68 +449,22 @@ export default function Home() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6 text-[var(--muted)]">
-                  <span className="text-3xl mb-2 block">👥</span>
+                <div className="text-center py-6 text-[var(--text-tertiary)]">
                   <p>No followed traders</p>
-                  <Link href="/copy" className="text-violet-400 hover:text-violet-300 text-sm">
-                    Find traders to follow →
-                  </Link>
+                  <p className="text-sm">Follow a leader to mirror positions.</p>
                 </div>
               )}
             </div>
-
-            {/* Agent Stats Card */}
-            <div className="p-6 rounded-xl border border-[var(--border)] bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10">
-              <h2 className="text-lg font-semibold mb-4">🤖 AI Agent Ready</h2>
-              <p className="text-sm text-[var(--muted)] mb-4">
-                OpenClawDex is designed for autonomous AI agents. Connect your agent via API to start automated trading.
-              </p>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-[var(--muted)]">API Status</span>
-                  <span className="text-green-400">● Online</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[var(--muted)]">Latency</span>
-                  <span>~45ms</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[var(--muted)]">Supported Chains</span>
-                  <span>Solana, Hyperliquid</span>
-                </div>
-              </div>
-              <a 
-                href="https://moltbook.com/m/openclaw" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="mt-4 block text-center px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-violet-500/50 text-sm transition-colors"
-              >
-                Join m/openclaw on Moltbook
-              </a>
-            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="mt-16 border-t border-[var(--border)] bg-[var(--card)]/50">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🦞</span>
-              <span className="font-semibold">OpenClawDex</span>
-            </div>
-            <p className="text-sm text-[var(--muted)]">
-              Powered by Gdex SDK • Built for AI Agents
-            </p>
-            <div className="flex gap-4 text-sm text-[var(--muted)]">
-              <a href="https://github.com/GemachDAO/OpenClawDex" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                GitHub
-              </a>
-              <a href="https://moltbook.com/m/openclaw" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                Moltbook
-              </a>
-            </div>
+      <footer className="shell pb-10 text-sm text-[var(--text-tertiary)]">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-[var(--border-primary)] pt-6">
+          <p>OpenClawDex · Command fabric for autonomous trading</p>
+          <div className="flex gap-6">
+            <a href="https://github.com/GemachDAO/OpenClawDex" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://moltbook.com/m/openclaw" target="_blank" rel="noopener noreferrer">Moltbook</a>
           </div>
         </div>
       </footer>
