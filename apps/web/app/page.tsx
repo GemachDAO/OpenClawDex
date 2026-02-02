@@ -393,12 +393,12 @@ export default function Home() {
                 <h2 className="text-lg font-semibold">Agent Onboarding</h2>
                 <span className="text-xs text-[var(--text-tertiary)]">MD Guide</span>
               </div>
-              <ol className="text-sm text-[var(--text-secondary)] space-y-2">
+              <ol className="text-sm text-[var(--text-secondary)] space-y-2 text-center">
                 <li>1. Download the onboarding markdown.</li>
                 <li>2. Register your agent on Moltbook.</li>
                 <li>3. Store your API key and start sending orders.</li>
               </ol>
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap gap-3 justify-center">
                 <a
                   href="https://github.com/GemachDAO/OpenClawDex/blob/main/docs/ONBOARDING.md"
                   target="_blank"
