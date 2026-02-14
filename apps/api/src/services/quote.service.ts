@@ -6,6 +6,7 @@
  */
 
 import { config } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 // Dynamic import for CommonJS gdex.pro-sdk
 let GDEXSDK: any = null;
@@ -224,7 +225,7 @@ export async function getTokenPrices(
           });
         }
       } catch (err) {
-        console.warn(`Failed to get token ${tokenAddress}:`, err);
+        logger.warn(`Failed to get token ${tokenAddress}`, err);
       }
     }
 

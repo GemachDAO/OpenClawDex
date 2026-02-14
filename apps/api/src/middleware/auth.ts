@@ -7,6 +7,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { validateAgent, getAgentProfile, MoltbookAgentProfile } from '../services/moltbook.service.js';
+import logger from '../utils/logger.js';
 
 // ============================================================================
 // Types
@@ -240,7 +241,7 @@ export function logAuthenticatedRequest(
   next: NextFunction
 ): void {
   if (req.agent) {
-    console.log(`[Auth] ${req.method} ${req.path} - Agent: ${req.agent.name}`);
+    logger.debug(`${req.method} ${req.path} - Agent: ${req.agent.name}`);
   }
   next();
 }

@@ -26,6 +26,7 @@ import {
   rateLimit,
   AuthenticatedRequest 
 } from '../middleware/auth.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
 
@@ -93,7 +94,7 @@ router.post('/trade', requireAuth, rateLimit({ maxRequests: 30, windowMs: 60000 
       post: result.post,
     });
   } catch (error) {
-    console.error('Error posting trade:', error);
+    logger.error('Error posting trade', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -146,7 +147,7 @@ router.post('/post', requireAuth, rateLimit({ maxRequests: 10, windowMs: 60000 }
       post: result.post,
     });
   } catch (error) {
-    console.error('Error creating post:', error);
+    logger.error('Error creating post', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -177,7 +178,7 @@ router.post('/posts/:postId/upvote', requireAuth, async (req: AuthenticatedReque
       message: 'Post upvoted',
     });
   } catch (error) {
-    console.error('Error upvoting post:', error);
+    logger.error('Error upvoting post', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -217,7 +218,7 @@ router.post('/posts/:postId/comment', requireAuth, rateLimit({ maxRequests: 20, 
       message: 'Comment added',
     });
   } catch (error) {
-    console.error('Error adding comment:', error);
+    logger.error('Error adding comment', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -246,7 +247,7 @@ router.get('/feed', requireAuth, async (req: AuthenticatedRequest, res: Response
       count: posts.length,
     });
   } catch (error) {
-    console.error('Error fetching feed:', error);
+    logger.error('Error fetching feed', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -272,7 +273,7 @@ router.get('/feed/openclaw', requireAuth, async (req: AuthenticatedRequest, res:
       count: posts.length,
     });
   } catch (error) {
-    console.error('Error fetching openclaw feed:', error);
+    logger.error('Error fetching openclaw feed', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -299,7 +300,7 @@ router.get('/feed/:submolt', requireAuth, async (req: AuthenticatedRequest, res:
       count: posts.length,
     });
   } catch (error) {
-    console.error('Error fetching submolt feed:', error);
+    logger.error('Error fetching submolt feed', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -334,7 +335,7 @@ router.post('/follow/:agentName', requireAuth, async (req: AuthenticatedRequest,
       message: `Now following ${agentName}`,
     });
   } catch (error) {
-    console.error('Error following agent:', error);
+    logger.error('Error following agent', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -365,7 +366,7 @@ router.delete('/follow/:agentName', requireAuth, async (req: AuthenticatedReques
       message: `Unfollowed ${agentName}`,
     });
   } catch (error) {
-    console.error('Error unfollowing agent:', error);
+    logger.error('Error unfollowing agent', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -403,7 +404,7 @@ router.get('/search', requireAuth, async (req: AuthenticatedRequest, res: Respon
       count: results.length,
     });
   } catch (error) {
-    console.error('Error searching:', error);
+    logger.error('Error searching', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -436,7 +437,7 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) 
       profile,
     });
   } catch (error) {
-    console.error('Error fetching profile:', error);
+    logger.error('Error fetching profile', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',

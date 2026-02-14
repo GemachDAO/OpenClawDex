@@ -9,6 +9,7 @@
  */
 
 import { config } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 // ============================================================================
 // Types
@@ -171,7 +172,7 @@ export async function getAgentProfile(apiKey: string): Promise<MoltbookAgentProf
   });
 
   if (!result.success) {
-    console.error('Failed to get agent profile:', result.error);
+    logger.error('Failed to get agent profile', result.error);
     return null;
   }
 
