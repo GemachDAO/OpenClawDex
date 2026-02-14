@@ -5,7 +5,6 @@
  * Supports multiple chains including Solana (Pump.fun) and EVM chains.
  */
 
-import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
 import { getSDK } from '../utils/sdkLoader.js';
 
@@ -146,7 +145,7 @@ export async function getQuote(
  */
 export async function getTokenPrice(
   tokenAddress: string,
-  chainId: number = 1
+  _chainId: number = 1
 ): Promise<TokenPrice> {
   try {
     const sdk = await getSDK();
@@ -177,7 +176,7 @@ export async function getTokenPrice(
  */
 export async function getTokenPrices(
   tokenAddresses: string[],
-  chainId: number = 1
+  _chainId: number = 1
 ): Promise<TokenPrice[]> {
   try {
     const sdk = await getSDK();
@@ -200,7 +199,7 @@ export async function getTokenPrices(
           });
         }
       } catch (err) {
-        logger.warn(`Failed to get token ${tokenAddress}`, err);
+        logger.warn(`Failed to get token ${tokenAddress}`, err instanceof Error ? err : undefined);
       }
     }
 

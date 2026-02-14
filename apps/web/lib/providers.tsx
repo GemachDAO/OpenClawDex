@@ -556,7 +556,7 @@ export function createActionHandlers(
 
     setFilter: async (params: ActionParams) => {
       // Handle filter updates - would update a filters state
-      console.log('Setting filter:', params);
+      // Filter params would be stored in state for the component
     },
   };
 }

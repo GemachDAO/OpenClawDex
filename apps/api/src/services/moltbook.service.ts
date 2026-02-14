@@ -8,7 +8,6 @@
  * Docs: https://www.moltbook.com/skill.md
  */
 
-import { config } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 // ============================================================================
@@ -113,16 +112,16 @@ async function moltbookRequest<T>(
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
 
     if (!response.ok) {
       return {
         success: false,
-        error: data.error || data.message || `HTTP ${response.status}`,
+        error: (data as any).error || (data as any).message || `HTTP ${response.status}`,
       };
     }
 
-    return { success: true, data };
+    return { success: true, data: data as T };
   } catch (error) {
     return {
       success: false,
@@ -416,7 +415,7 @@ export interface TradeResult {
 /**
  * Format trade result as a Moltbook post
  */
-export function formatTradePost(trade: TradeResult, agentName: string): CreatePostOptions {
+export function formatTradePost(trade: TradeResult, _agentName: string): CreatePostOptions {
   let title: string;
   let content: string;
 

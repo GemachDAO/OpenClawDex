@@ -6,7 +6,6 @@
  */
 
 import { Wallet, HDNodeWallet, randomBytes } from 'ethers';
-import { config } from '../config/index.js';
 import { getSDK } from '../utils/sdkLoader.js';
 
 /**

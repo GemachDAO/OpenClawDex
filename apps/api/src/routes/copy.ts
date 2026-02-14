@@ -83,7 +83,7 @@ router.get('/traders', async (req: Request, res: Response) => {
  */
 router.get('/traders/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
     const trader = await getTraderDetails(id);
 
@@ -112,7 +112,7 @@ router.get('/traders/:id', async (req: Request, res: Response) => {
  */
 router.get('/traders/:id/positions', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { limit = '20' } = req.query;
 
     const positions = await getTraderPositions(

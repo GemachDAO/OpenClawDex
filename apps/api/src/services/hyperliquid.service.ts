@@ -5,7 +5,6 @@
  * Supports perpetual futures with up to 50x leverage.
  */
 
-import { config } from '../config/index.js';
 import { getSDK } from '../utils/sdkLoader.js';
 
 /**

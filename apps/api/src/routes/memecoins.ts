@@ -176,7 +176,7 @@ router.get('/search', async (req: Request, res: Response) => {
  */
 router.get('/:address', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
+    const address = Array.isArray(req.params.address) ? req.params.address[0] : req.params.address;
 
     if (!address) {
       return res.status(400).json({
@@ -212,7 +212,7 @@ router.get('/:address', async (req: Request, res: Response) => {
  */
 router.get('/:address/curve', async (req: Request, res: Response) => {
   try {
-    const { address } = req.params;
+    const address = Array.isArray(req.params.address) ? req.params.address[0] : req.params.address;
 
     if (!address) {
       return res.status(400).json({

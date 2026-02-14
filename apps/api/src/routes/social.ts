@@ -22,7 +22,6 @@ import {
 } from '../services/moltbook.service.js';
 import { 
   requireAuth, 
-  optionalAuth, 
   rateLimit,
   AuthenticatedRequest 
 } from '../middleware/auth.js';
@@ -161,7 +160,7 @@ router.post('/post', requireAuth, rateLimit({ maxRequests: 10, windowMs: 60000 }
  */
 router.post('/posts/:postId/upvote', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { postId } = req.params;
+    const postId = Array.isArray(req.params.postId) ? req.params.postId[0] : req.params.postId;
 
     const success = await upvotePost(req.apiKey!, postId);
 
@@ -192,7 +191,7 @@ router.post('/posts/:postId/upvote', requireAuth, async (req: AuthenticatedReque
  */
 router.post('/posts/:postId/comment', requireAuth, rateLimit({ maxRequests: 20, windowMs: 60000 }), async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { postId } = req.params;
+    const postId = Array.isArray(req.params.postId) ? req.params.postId[0] : req.params.postId;
     const { content, parentId } = req.body;
 
     if (!content) {
@@ -287,7 +286,7 @@ router.get('/feed/openclaw', requireAuth, async (req: AuthenticatedRequest, res:
  */
 router.get('/feed/:submolt', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { submolt } = req.params;
+    const submolt = Array.isArray(req.params.submolt) ? req.params.submolt[0] : req.params.submolt;
     const sort = (req.query.sort as 'hot' | 'new' | 'top') || 'hot';
     const limit = Math.min(Number(req.query.limit) || 25, 100);
 
@@ -318,7 +317,7 @@ router.get('/feed/:submolt', requireAuth, async (req: AuthenticatedRequest, res:
  */
 router.post('/follow/:agentName', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { agentName } = req.params;
+    const agentName = Array.isArray(req.params.agentName) ? req.params.agentName[0] : req.params.agentName;
 
     const success = await followAgent(req.apiKey!, agentName);
 
@@ -349,7 +348,7 @@ router.post('/follow/:agentName', requireAuth, async (req: AuthenticatedRequest,
  */
 router.delete('/follow/:agentName', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { agentName } = req.params;
+    const agentName = Array.isArray(req.params.agentName) ? req.params.agentName[0] : req.params.agentName;
 
     const success = await unfollowAgent(req.apiKey!, agentName);
 

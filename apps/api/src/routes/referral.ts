@@ -14,7 +14,6 @@ import {
   validateReferralCode,
   deactivateReferralLink,
   shareToMoltbook,
-  generateShareMessage,
   shareToOtherPlatforms,
   getReferralLeaderboard,
   getAllTiers,
@@ -23,7 +22,6 @@ import {
 } from '../services/referral.service.js';
 import {
   requireAuth,
-  optionalAuth,
   rateLimit,
   AuthenticatedRequest,
 } from '../middleware/auth.js';
@@ -119,7 +117,7 @@ router.get('/link/:code', async (req, res: Response) => {
  */
 router.delete('/link/:code', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { code } = req.params;
+    const code = Array.isArray(req.params.code) ? req.params.code[0] : req.params.code;
     
     const success = deactivateReferralLink(code, req.agent!.name);
 

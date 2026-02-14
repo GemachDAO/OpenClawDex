@@ -5,7 +5,6 @@
  * Handles transaction building, signing, and submission.
  */
 
-import { config } from '../config/index.js';
 import { getSDK } from '../utils/sdkLoader.js';
 
 /**
