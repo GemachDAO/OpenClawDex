@@ -30,8 +30,14 @@ export function info(message: string, context?: LogContext): void {
 /**
  * Log warning message
  */
-export function warn(message: string, context?: LogContext): void {
-  console.warn(formatLogMessage('warn', message, context));
+export function warn(message: string, err?: Error | unknown, context?: LogContext): void {
+  const warnContext = err instanceof Error 
+    ? { ...context, error: err.message, stack: err.stack }
+    : err !== undefined
+    ? { ...context, error: String(err) }
+    : context;
+  
+  console.warn(formatLogMessage('warn', message, warnContext));
 }
 
 /**
@@ -49,8 +55,8 @@ export function error(message: string, err?: Error | unknown, context?: LogConte
  * Log debug message (only in development)
  */
 export function debug(message: string, context?: LogContext): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.debug(formatLogMessage('debug', message, context));
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(formatLogMessage('debug', message, context));
   }
 }
 

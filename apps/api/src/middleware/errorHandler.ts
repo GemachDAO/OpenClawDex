@@ -36,15 +36,11 @@ export function errorHandler(
     query: req.query,
   });
 
-  // Don't expose internal errors in production
-  const message = process.env.NODE_ENV === 'production' 
-    ? 'Internal server error'
-    : err.message;
-
+  // Return appropriate error response
   res.status(500).json({
     success: false,
     error: 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { message }),
+    ...(process.env.NODE_ENV !== 'production' && { details: err.message }),
   });
 }
 

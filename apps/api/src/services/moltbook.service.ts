@@ -112,16 +112,17 @@ async function moltbookRequest<T>(
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    const data: any = await response.json();
+    const data = await response.json() as T;
 
     if (!response.ok) {
+      const errorData = data as any;
       return {
         success: false,
-        error: (data as any).error || (data as any).message || `HTTP ${response.status}`,
+        error: errorData.error || errorData.message || `HTTP ${response.status}`,
       };
     }
 
-    return { success: true, data: data as T };
+    return { success: true, data };
   } catch (error) {
     return {
       success: false,

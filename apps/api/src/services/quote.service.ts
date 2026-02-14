@@ -199,7 +199,7 @@ export async function getTokenPrices(
           });
         }
       } catch (err) {
-        logger.warn(`Failed to get token ${tokenAddress}`, err instanceof Error ? err : undefined);
+        logger.warn(`Failed to get token ${tokenAddress}`, err);
       }
     }
 
