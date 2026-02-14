@@ -5,33 +5,8 @@
  * Supports multiple chains including Solana (Pump.fun) and EVM chains.
  */
 
-import { config } from '../config/index.js';
-
-// Dynamic import for CommonJS gdex.pro-sdk
-let GDEXSDK: any = null;
-let sdkInstance: any = null;
-
-async function loadSDK() {
-  if (!GDEXSDK) {
-    const module = await import('gdex.pro-sdk');
-    GDEXSDK = module.GDEXSDK;
-  }
-  return GDEXSDK;
-}
-
-/**
- * Get or create SDK instance
- */
-async function getSDK(): Promise<any> {
-  if (!sdkInstance) {
-    const SDK = await loadSDK();
-    sdkInstance = new SDK('https://trade-api.gemach.io/v1', {
-      apiKey: config.gdex.apiKey || undefined,
-      timeout: 10000,
-    });
-  }
-  return sdkInstance;
-}
+import logger from '../utils/logger.js';
+import { getSDK } from '../utils/sdkLoader.js';
 
 /**
  * Token info
@@ -170,7 +145,7 @@ export async function getQuote(
  */
 export async function getTokenPrice(
   tokenAddress: string,
-  chainId: number = 1
+  _chainId: number = 1
 ): Promise<TokenPrice> {
   try {
     const sdk = await getSDK();
@@ -201,7 +176,7 @@ export async function getTokenPrice(
  */
 export async function getTokenPrices(
   tokenAddresses: string[],
-  chainId: number = 1
+  _chainId: number = 1
 ): Promise<TokenPrice[]> {
   try {
     const sdk = await getSDK();
@@ -224,7 +199,7 @@ export async function getTokenPrices(
           });
         }
       } catch (err) {
-        console.warn(`Failed to get token ${tokenAddress}:`, err);
+        logger.warn(`Failed to get token ${tokenAddress}`, err);
       }
     }
 

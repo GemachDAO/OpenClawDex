@@ -5,33 +5,7 @@
  * Supports listing, buying, and selling meme coins.
  */
 
-import { config } from '../config/index.js';
-
-// Dynamic import for CommonJS gdex.pro-sdk
-let GDEXSDK: any = null;
-let sdkInstance: any = null;
-
-async function loadSDK() {
-  if (!GDEXSDK) {
-    const module = await import('gdex.pro-sdk');
-    GDEXSDK = module.GDEXSDK;
-  }
-  return GDEXSDK;
-}
-
-/**
- * Get or create SDK instance
- */
-async function getSDK(): Promise<any> {
-  if (!sdkInstance) {
-    const SDK = await loadSDK();
-    sdkInstance = new SDK('https://trade-api.gemach.io/v1', {
-      apiKey: config.gdex.apiKey || undefined,
-      timeout: 10000,
-    });
-  }
-  return sdkInstance;
-}
+import { getSDK } from '../utils/sdkLoader.js';
 
 /**
  * Meme coin information
@@ -97,26 +71,14 @@ export interface TrendingFilter {
  */
 export async function listMemeCoins(
   limit: number = 20,
-  offset: number = 0,
-  filter?: TrendingFilter
+  _offset: number = 0,
+  _filter?: TrendingFilter
 ): Promise<MemeCoinInfo[]> {
   try {
     const sdk = await getSDK();
 
     // Get trending tokens from Solana/Pump.fun via SDK
-    const params = {
-      chainId: 'solana-mainnet',
-      limit,
-      offset,
-      sortBy: filter?.sortBy || 'volume',
-      sortOrder: filter?.sortOrder || 'desc',
-      minMarketCap: filter?.minMarketCap,
-      maxMarketCap: filter?.maxMarketCap,
-      minVolume: filter?.minVolume,
-      graduated: filter?.isGraduated,
-      timeframe: filter?.timeframe || '24h',
-    };
-
+    // Note: SDK params would be used in future when SDK supports detailed filtering
     const response = await sdk.tokens.getTrendingTokens(limit);
 
     if (!response || response.error) {
@@ -382,21 +344,13 @@ export async function getBondingCurveInfo(tokenAddress: string): Promise<{
  */
 export async function getNewLaunches(
   limit: number = 20,
-  minAge?: number, // minimum age in minutes
-  maxAge?: number // maximum age in minutes
+  _minAge?: number, // minimum age in minutes
+  _maxAge?: number // maximum age in minutes
 ): Promise<MemeCoinInfo[]> {
   try {
     const sdk = await getSDK();
 
-    const params = {
-      chainId: 'solana-mainnet',
-      limit,
-      sortBy: 'createdAt',
-      sortOrder: 'desc',
-      minAge,
-      maxAge,
-    };
-
+    // Note: SDK params would be used in future when SDK supports minAge/maxAge filtering
     const response = await sdk.tokens.getNewestTokens(1, 1, "", limit);
 
     if (!response || response.error) {

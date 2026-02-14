@@ -8,7 +8,7 @@
  * Docs: https://www.moltbook.com/skill.md
  */
 
-import { config } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 // ============================================================================
 // Types
@@ -112,12 +112,13 @@ async function moltbookRequest<T>(
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    const data = await response.json();
+    const data = await response.json() as T;
 
     if (!response.ok) {
+      const errorData = data as any;
       return {
         success: false,
-        error: data.error || data.message || `HTTP ${response.status}`,
+        error: errorData.error || errorData.message || `HTTP ${response.status}`,
       };
     }
 
@@ -171,7 +172,7 @@ export async function getAgentProfile(apiKey: string): Promise<MoltbookAgentProf
   });
 
   if (!result.success) {
-    console.error('Failed to get agent profile:', result.error);
+    logger.error('Failed to get agent profile', result.error);
     return null;
   }
 
@@ -415,7 +416,7 @@ export interface TradeResult {
 /**
  * Format trade result as a Moltbook post
  */
-export function formatTradePost(trade: TradeResult, agentName: string): CreatePostOptions {
+export function formatTradePost(trade: TradeResult, _agentName: string): CreatePostOptions {
   let title: string;
   let content: string;
 

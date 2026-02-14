@@ -14,7 +14,6 @@ import {
   validateReferralCode,
   deactivateReferralLink,
   shareToMoltbook,
-  generateShareMessage,
   shareToOtherPlatforms,
   getReferralLeaderboard,
   getAllTiers,
@@ -23,10 +22,10 @@ import {
 } from '../services/referral.service.js';
 import {
   requireAuth,
-  optionalAuth,
   rateLimit,
   AuthenticatedRequest,
 } from '../middleware/auth.js';
+import logger from '../utils/logger.js';
 
 const router = Router();
 
@@ -65,7 +64,7 @@ router.post('/link', requireAuth, rateLimit({ maxRequests: 10, windowMs: 60000 }
       },
     });
   } catch (error) {
-    console.error('Error generating referral link:', error);
+    logger.error('Error generating referral link', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -104,7 +103,7 @@ router.get('/link/:code', async (req, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching referral link:', error);
+    logger.error('Error fetching referral link', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -118,7 +117,7 @@ router.get('/link/:code', async (req, res: Response) => {
  */
 router.delete('/link/:code', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { code } = req.params;
+    const code = Array.isArray(req.params.code) ? req.params.code[0] : req.params.code;
     
     const success = deactivateReferralLink(code, req.agent!.name);
 
@@ -135,7 +134,7 @@ router.delete('/link/:code', requireAuth, async (req: AuthenticatedRequest, res:
       message: 'Referral link deactivated',
     });
   } catch (error) {
-    console.error('Error deactivating referral link:', error);
+    logger.error('Error deactivating referral link', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -159,7 +158,7 @@ router.get('/validate/:code', async (req, res: Response) => {
       referrer: result.link?.agentName,
     });
   } catch (error) {
-    console.error('Error validating referral code:', error);
+    logger.error('Error validating referral code', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -207,7 +206,7 @@ router.post('/track', requireAuth, async (req: AuthenticatedRequest, res: Respon
       referralId: result.record?.id,
     });
   } catch (error) {
-    console.error('Error tracking referral:', error);
+    logger.error('Error tracking referral', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -262,7 +261,7 @@ router.get('/stats', requireAuth, async (req: AuthenticatedRequest, res: Respons
       },
     });
   } catch (error) {
-    console.error('Error fetching referral stats:', error);
+    logger.error('Error fetching referral stats', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -292,7 +291,7 @@ router.get('/referrals', requireAuth, async (req: AuthenticatedRequest, res: Res
       count: referrals.length,
     });
   } catch (error) {
-    console.error('Error fetching referrals:', error);
+    logger.error('Error fetching referrals', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -345,7 +344,7 @@ router.post('/share/moltbook', requireAuth, rateLimit({ maxRequests: 5, windowMs
       message: 'Referral shared to Moltbook m/openclaw',
     });
   } catch (error) {
-    console.error('Error sharing to Moltbook:', error);
+    logger.error('Error sharing to Moltbook', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -391,7 +390,7 @@ router.post('/share/generate', requireAuth, async (req: AuthenticatedRequest, re
       messages,
     });
   } catch (error) {
-    console.error('Error generating share messages:', error);
+    logger.error('Error generating share messages', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -416,7 +415,7 @@ router.get('/tiers', async (_req, res: Response) => {
       tiers,
     });
   } catch (error) {
-    console.error('Error fetching tiers:', error);
+    logger.error('Error fetching tiers', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -449,7 +448,7 @@ router.get('/tiers/:tier', async (req, res: Response) => {
       tier: tierInfo,
     });
   } catch (error) {
-    console.error('Error fetching tier info:', error);
+    logger.error('Error fetching tier info', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -472,7 +471,7 @@ router.get('/leaderboard', async (req, res: Response) => {
       count: leaderboard.length,
     });
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
+    logger.error('Error fetching leaderboard', error);
     res.status(500).json({
       success: false,
       error: 'Internal server error',

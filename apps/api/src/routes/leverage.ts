@@ -60,7 +60,7 @@ router.get('/markets', async (_req: Request, res: Response) => {
  */
 router.get('/markets/:symbol', async (req: Request, res: Response) => {
   try {
-    const { symbol } = req.params;
+    const symbol = Array.isArray(req.params.symbol) ? req.params.symbol[0] : req.params.symbol;
 
     const market = await getMarketInfo(symbol);
 
@@ -155,7 +155,7 @@ router.get('/positions', async (req: Request, res: Response) => {
  */
 router.get('/positions/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { walletAddress } = req.query;
 
     if (!walletAddress || typeof walletAddress !== 'string') {
@@ -359,7 +359,7 @@ router.get('/orders', async (req: Request, res: Response) => {
  */
 router.delete('/orders/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { walletAddress } = req.query;
 
     if (!walletAddress || typeof walletAddress !== 'string') {
@@ -396,7 +396,7 @@ router.delete('/orders/:id', async (req: Request, res: Response) => {
  */
 router.put('/positions/:id/leverage', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { walletAddress, newLeverage } = req.body;
 
     if (!walletAddress || typeof walletAddress !== 'string') {
@@ -440,7 +440,7 @@ router.put('/positions/:id/leverage', async (req: Request, res: Response) => {
  */
 router.put('/positions/:id/sltp', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const { walletAddress, stopLoss, takeProfit } = req.body;
 
     if (!walletAddress || typeof walletAddress !== 'string') {

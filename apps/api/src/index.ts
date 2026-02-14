@@ -12,6 +12,7 @@ import WebSocket from 'ws';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { config } from './config/index.js';
+import logger from './utils/logger.js';
 
 // Import routes
 import walletRoutes from './routes/wallet.js';
@@ -30,7 +31,7 @@ try {
   await import('gdex.pro-sdk');
   gdexAvailable = true;
 } catch (e) {
-  console.warn('Warning: gdex.pro-sdk not fully loaded, some features may be limited');
+  logger.warn('gdex.pro-sdk not fully loaded, some features may be limited');
 }
 
 const app: Express = express();
@@ -83,7 +84,7 @@ app.use('/api/referral', referralRoutes);
 
 // Error handling middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('Error:', err.message);
+  logger.error('Request error', err);
   res.status(500).json({ 
     success: false, 
     error: 'Internal server error',
@@ -101,7 +102,7 @@ app.use((_req: Request, res: Response) => {
 
 // Start server
 app.listen(config.port, () => {
-  console.log(`
+  logger.info(`
   ╔═══════════════════════════════════════════════════════════╗
   ║                                                           ║
   ║   🦞 OpenClawDex API Server                               ║

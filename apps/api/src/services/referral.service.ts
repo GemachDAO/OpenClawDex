@@ -6,7 +6,7 @@
  */
 
 import crypto from 'crypto';
-import { postTrade, createPost, OPENCLAW_SUBMOLT } from './moltbook.service.js';
+import { createPost, OPENCLAW_SUBMOLT } from './moltbook.service.js';
 
 // ============================================================================
 // Types
@@ -156,7 +156,7 @@ function calculateTier(referralCount: number): ReferralTier {
 /**
  * Get or create agent stats
  */
-function getOrCreateStats(agentId: string, agentName: string): ReferralStats {
+function getOrCreateStats(agentId: string, _agentName: string): ReferralStats {
   let stats = agentStats.get(agentId);
   if (!stats) {
     stats = {
@@ -417,7 +417,7 @@ export function deactivateReferralLink(code: string, agentId: string): boolean {
  */
 export async function shareToMoltbook(
   apiKey: string,
-  agentName: string,
+  _agentName: string,
   referralLink: ReferralLink
 ): Promise<{ success: boolean; error?: string }> {
   const result = await createPost(apiKey, {
@@ -446,7 +446,7 @@ See you in m/openclaw! 🦞
  * Generate share message for other platforms
  */
 export function generateShareMessage(
-  agentName: string,
+  _agentName: string,
   referralLink: ReferralLink,
   platform: 'twitter' | 'discord' | 'telegram' | 'generic'
 ): string {
