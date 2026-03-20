@@ -29,10 +29,12 @@ export type LeaderboardTimeframe = 'daily' | 'weekly' | 'monthly' | 'all';
 
 // ============================================================================
 // Timeframe Mapping
+// Note: The underlying trading API supports '7d', '30d', '90d', and 'all'.
+// Frontend timeframes are mapped to the nearest available API timeframe.
 // ============================================================================
 
 const TIMEFRAME_MAP: Record<LeaderboardTimeframe, '7d' | '30d' | '90d' | 'all'> = {
-  daily: '7d',
+  daily: '7d',     // closest available (API does not support 1d)
   weekly: '7d',
   monthly: '30d',
   all: 'all',
