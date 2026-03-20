@@ -38,59 +38,45 @@ interface Agent {
 type TimeFilter = 'daily' | 'weekly' | 'monthly' | 'all';
 
 // ============================================================================
-// Mock Data
+// API Configuration
 // ============================================================================
 
-const LEADERBOARD_DATA: Record<TimeFilter, Agent[]> = {
-  daily: [
-    { id: 'agent-1', name: 'AlphaBot', walletAddress: '0x1234...5678', rank: 1, previousRank: 3, pnl: 45200, pnlPercent: 18.5, trades: 47, winRate: 72.3, volume: 890000, followers: 2340, isVerified: true, badges: ['🏆', '🔥'], streak: 5, bestTrade: 12500, worstTrade: -3200 },
-    { id: 'agent-2', name: 'NeuralTrader', walletAddress: '0xabcd...ef01', rank: 2, previousRank: 1, pnl: 38900, pnlPercent: 15.2, trades: 62, winRate: 68.5, volume: 1250000, followers: 5680, isVerified: true, badges: ['⚡', '💎'], streak: 3, bestTrade: 8900, worstTrade: -4100 },
-    { id: 'agent-3', name: 'DegenMachine', walletAddress: '0x5678...9abc', rank: 3, previousRank: 5, pnl: 31500, pnlPercent: 42.1, trades: 156, winRate: 54.2, volume: 520000, followers: 8920, isVerified: false, badges: ['🚀'], streak: 2, bestTrade: 25000, worstTrade: -8500 },
-    { id: 'agent-4', name: 'WhaleWatcher', walletAddress: '0xdef0...1234', rank: 4, previousRank: 2, pnl: 28700, pnlPercent: 8.9, trades: 23, winRate: 78.3, volume: 2100000, followers: 3450, isVerified: true, badges: ['🐋'], streak: 7, bestTrade: 15200, worstTrade: -2100 },
-    { id: 'agent-5', name: 'MomentumAI', walletAddress: '0x9012...3456', rank: 5, previousRank: 4, pnl: 24100, pnlPercent: 12.4, trades: 89, winRate: 61.8, volume: 680000, followers: 1890, isVerified: true, badges: ['📈'], streak: 4, bestTrade: 7800, worstTrade: -3900 },
-    { id: 'agent-6', name: 'ScalpKing', walletAddress: '0x3456...7890', rank: 6, previousRank: 8, pnl: 19800, pnlPercent: 9.1, trades: 234, winRate: 58.9, volume: 450000, followers: 2100, isVerified: false, badges: [], streak: 1, bestTrade: 4200, worstTrade: -2800 },
-    { id: 'agent-7', name: 'TrendHunter', walletAddress: '0x7890...abcd', rank: 7, previousRank: 6, pnl: 17200, pnlPercent: 7.8, trades: 45, winRate: 66.7, volume: 320000, followers: 980, isVerified: true, badges: ['🎯'], streak: 2, bestTrade: 6500, worstTrade: -2400 },
-    { id: 'agent-8', name: 'ArbitrageBot', walletAddress: '0xcdef...5678', rank: 8, previousRank: 7, pnl: 15600, pnlPercent: 5.2, trades: 412, winRate: 71.2, volume: 1800000, followers: 1560, isVerified: true, badges: ['⚖️'], streak: 8, bestTrade: 2100, worstTrade: -890 },
-    { id: 'agent-9', name: 'VolatilityPro', walletAddress: '0x2345...6789', rank: 9, previousRank: 12, pnl: 12900, pnlPercent: 21.3, trades: 78, winRate: 52.6, volume: 290000, followers: 720, isVerified: false, badges: ['💥'], streak: 0, bestTrade: 18000, worstTrade: -9200 },
-    { id: 'agent-10', name: 'SteadyGains', walletAddress: '0x6789...0123', rank: 10, previousRank: 9, pnl: 11400, pnlPercent: 4.8, trades: 31, winRate: 80.6, volume: 420000, followers: 890, isVerified: true, badges: ['🛡️'], streak: 12, bestTrade: 3200, worstTrade: -1100 },
-  ],
-  weekly: [
-    { id: 'agent-2', name: 'NeuralTrader', walletAddress: '0xabcd...ef01', rank: 1, previousRank: 2, pnl: 185000, pnlPercent: 68.5, trades: 312, winRate: 69.2, volume: 5800000, followers: 5680, isVerified: true, badges: ['⚡', '💎', '🏆'], streak: 3, bestTrade: 28000, worstTrade: -8900 },
-    { id: 'agent-1', name: 'AlphaBot', walletAddress: '0x1234...5678', rank: 2, previousRank: 1, pnl: 167000, pnlPercent: 52.3, trades: 245, winRate: 71.8, volume: 4200000, followers: 2340, isVerified: true, badges: ['🏆', '🔥'], streak: 5, bestTrade: 32000, worstTrade: -7200 },
-    { id: 'agent-3', name: 'DegenMachine', walletAddress: '0x5678...9abc', rank: 3, previousRank: 4, pnl: 142000, pnlPercent: 156.2, trades: 892, winRate: 53.8, volume: 2100000, followers: 8920, isVerified: false, badges: ['🚀', '🔥'], streak: 2, bestTrade: 45000, worstTrade: -18000 },
-    { id: 'agent-4', name: 'WhaleWatcher', walletAddress: '0xdef0...1234', rank: 4, previousRank: 3, pnl: 128000, pnlPercent: 32.1, trades: 98, winRate: 76.5, volume: 8900000, followers: 3450, isVerified: true, badges: ['🐋'], streak: 7, bestTrade: 42000, worstTrade: -9800 },
-    { id: 'agent-8', name: 'ArbitrageBot', walletAddress: '0xcdef...5678', rank: 5, previousRank: 6, pnl: 98000, pnlPercent: 28.9, trades: 2145, winRate: 72.1, volume: 12000000, followers: 1560, isVerified: true, badges: ['⚖️', '🤖'], streak: 8, bestTrade: 5200, worstTrade: -2100 },
-    { id: 'agent-5', name: 'MomentumAI', walletAddress: '0x9012...3456', rank: 6, previousRank: 5, pnl: 89000, pnlPercent: 38.2, trades: 423, winRate: 62.4, volume: 3200000, followers: 1890, isVerified: true, badges: ['📈'], streak: 4, bestTrade: 18000, worstTrade: -7800 },
-    { id: 'agent-10', name: 'SteadyGains', walletAddress: '0x6789...0123', rank: 7, previousRank: 8, pnl: 72000, pnlPercent: 24.5, trades: 156, winRate: 79.5, volume: 2100000, followers: 890, isVerified: true, badges: ['🛡️'], streak: 12, bestTrade: 8900, worstTrade: -2400 },
-    { id: 'agent-7', name: 'TrendHunter', walletAddress: '0x7890...abcd', rank: 8, previousRank: 7, pnl: 65000, pnlPercent: 22.1, trades: 198, winRate: 65.2, volume: 1500000, followers: 980, isVerified: true, badges: ['🎯'], streak: 2, bestTrade: 12000, worstTrade: -5600 },
-    { id: 'agent-6', name: 'ScalpKing', walletAddress: '0x3456...7890', rank: 9, previousRank: 10, pnl: 58000, pnlPercent: 19.8, trades: 1245, winRate: 57.8, volume: 2800000, followers: 2100, isVerified: false, badges: [], streak: 1, bestTrade: 6200, worstTrade: -4100 },
-    { id: 'agent-9', name: 'VolatilityPro', walletAddress: '0x2345...6789', rank: 10, previousRank: 9, pnl: 45000, pnlPercent: 62.3, trades: 356, winRate: 51.4, volume: 1200000, followers: 720, isVerified: false, badges: ['💥'], streak: 0, bestTrade: 32000, worstTrade: -15000 },
-  ],
-  monthly: [
-    { id: 'agent-1', name: 'AlphaBot', walletAddress: '0x1234...5678', rank: 1, previousRank: 1, pnl: 892000, pnlPercent: 245.2, trades: 1024, winRate: 70.5, volume: 18500000, followers: 2340, isVerified: true, badges: ['🏆', '🔥', '💎'], streak: 5, bestTrade: 85000, worstTrade: -18000 },
-    { id: 'agent-2', name: 'NeuralTrader', walletAddress: '0xabcd...ef01', rank: 2, previousRank: 2, pnl: 756000, pnlPercent: 198.5, trades: 1456, winRate: 68.9, volume: 24000000, followers: 5680, isVerified: true, badges: ['⚡', '💎'], streak: 3, bestTrade: 72000, worstTrade: -22000 },
-    { id: 'agent-4', name: 'WhaleWatcher', walletAddress: '0xdef0...1234', rank: 3, previousRank: 4, pnl: 542000, pnlPercent: 125.8, trades: 412, winRate: 75.2, volume: 42000000, followers: 3450, isVerified: true, badges: ['🐋', '🏆'], streak: 7, bestTrade: 120000, worstTrade: -28000 },
-    { id: 'agent-3', name: 'DegenMachine', walletAddress: '0x5678...9abc', rank: 4, previousRank: 3, pnl: 485000, pnlPercent: 420.5, trades: 3892, winRate: 52.1, volume: 8500000, followers: 8920, isVerified: false, badges: ['🚀', '🔥'], streak: 2, bestTrade: 125000, worstTrade: -45000 },
-    { id: 'agent-8', name: 'ArbitrageBot', walletAddress: '0xcdef...5678', rank: 5, previousRank: 5, pnl: 412000, pnlPercent: 98.2, trades: 9845, winRate: 71.8, volume: 56000000, followers: 1560, isVerified: true, badges: ['⚖️', '🤖'], streak: 8, bestTrade: 12000, worstTrade: -4500 },
-    { id: 'agent-5', name: 'MomentumAI', walletAddress: '0x9012...3456', rank: 6, previousRank: 6, pnl: 356000, pnlPercent: 142.8, trades: 1823, winRate: 61.5, volume: 12800000, followers: 1890, isVerified: true, badges: ['📈'], streak: 4, bestTrade: 45000, worstTrade: -18000 },
-    { id: 'agent-10', name: 'SteadyGains', walletAddress: '0x6789...0123', rank: 7, previousRank: 7, pnl: 298000, pnlPercent: 85.2, trades: 624, winRate: 78.8, volume: 8900000, followers: 890, isVerified: true, badges: ['🛡️', '💎'], streak: 12, bestTrade: 22000, worstTrade: -5800 },
-    { id: 'agent-7', name: 'TrendHunter', walletAddress: '0x7890...abcd', rank: 8, previousRank: 8, pnl: 245000, pnlPercent: 72.5, trades: 845, winRate: 64.8, volume: 6200000, followers: 980, isVerified: true, badges: ['🎯'], streak: 2, bestTrade: 35000, worstTrade: -12000 },
-    { id: 'agent-6', name: 'ScalpKing', walletAddress: '0x3456...7890', rank: 9, previousRank: 9, pnl: 198000, pnlPercent: 58.9, trades: 5234, winRate: 56.2, volume: 11200000, followers: 2100, isVerified: false, badges: [], streak: 1, bestTrade: 15000, worstTrade: -8900 },
-    { id: 'agent-9', name: 'VolatilityPro', walletAddress: '0x2345...6789', rank: 10, previousRank: 11, pnl: 156000, pnlPercent: 185.2, trades: 1456, winRate: 50.8, volume: 4800000, followers: 720, isVerified: false, badges: ['💥'], streak: 0, bestTrade: 85000, worstTrade: -42000 },
-  ],
-  all: [
-    { id: 'agent-1', name: 'AlphaBot', walletAddress: '0x1234...5678', rank: 1, previousRank: 1, pnl: 4520000, pnlPercent: 1245.2, trades: 12456, winRate: 69.8, volume: 185000000, followers: 2340, isVerified: true, badges: ['🏆', '🔥', '💎', '👑'], streak: 5, bestTrade: 185000, worstTrade: -42000 },
-    { id: 'agent-2', name: 'NeuralTrader', walletAddress: '0xabcd...ef01', rank: 2, previousRank: 2, pnl: 3890000, pnlPercent: 956.5, trades: 18234, winRate: 68.2, volume: 245000000, followers: 5680, isVerified: true, badges: ['⚡', '💎', '👑'], streak: 3, bestTrade: 142000, worstTrade: -58000 },
-    { id: 'agent-4', name: 'WhaleWatcher', walletAddress: '0xdef0...1234', rank: 3, previousRank: 3, pnl: 2850000, pnlPercent: 542.8, trades: 4521, winRate: 74.5, volume: 420000000, followers: 3450, isVerified: true, badges: ['🐋', '🏆', '💎'], streak: 7, bestTrade: 320000, worstTrade: -85000 },
-    { id: 'agent-8', name: 'ArbitrageBot', walletAddress: '0xcdef...5678', rank: 4, previousRank: 4, pnl: 2120000, pnlPercent: 425.2, trades: 124567, winRate: 71.2, volume: 680000000, followers: 1560, isVerified: true, badges: ['⚖️', '🤖', '💎'], streak: 8, bestTrade: 28000, worstTrade: -12000 },
-    { id: 'agent-3', name: 'DegenMachine', walletAddress: '0x5678...9abc', rank: 5, previousRank: 5, pnl: 1980000, pnlPercent: 1856.2, trades: 45892, winRate: 51.8, volume: 85000000, followers: 8920, isVerified: false, badges: ['🚀', '🔥'], streak: 2, bestTrade: 425000, worstTrade: -185000 },
-    { id: 'agent-5', name: 'MomentumAI', walletAddress: '0x9012...3456', rank: 6, previousRank: 6, pnl: 1650000, pnlPercent: 542.8, trades: 21456, winRate: 60.8, volume: 128000000, followers: 1890, isVerified: true, badges: ['📈', '💎'], streak: 4, bestTrade: 95000, worstTrade: -42000 },
-    { id: 'agent-10', name: 'SteadyGains', walletAddress: '0x6789...0123', rank: 7, previousRank: 7, pnl: 1420000, pnlPercent: 385.2, trades: 7824, winRate: 77.5, volume: 89000000, followers: 890, isVerified: true, badges: ['🛡️', '💎'], streak: 12, bestTrade: 58000, worstTrade: -18000 },
-    { id: 'agent-7', name: 'TrendHunter', walletAddress: '0x7890...abcd', rank: 8, previousRank: 8, pnl: 1180000, pnlPercent: 298.5, trades: 9845, winRate: 63.5, volume: 62000000, followers: 980, isVerified: true, badges: ['🎯'], streak: 2, bestTrade: 78000, worstTrade: -32000 },
-    { id: 'agent-6', name: 'ScalpKing', walletAddress: '0x3456...7890', rank: 9, previousRank: 9, pnl: 920000, pnlPercent: 245.8, trades: 62345, winRate: 55.8, volume: 112000000, followers: 2100, isVerified: false, badges: [], streak: 1, bestTrade: 42000, worstTrade: -25000 },
-    { id: 'agent-9', name: 'VolatilityPro', walletAddress: '0x2345...6789', rank: 10, previousRank: 10, pnl: 680000, pnlPercent: 856.2, trades: 15678, winRate: 49.5, volume: 48000000, followers: 720, isVerified: false, badges: ['💥'], streak: 0, bestTrade: 185000, worstTrade: -95000 },
-  ],
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+async function fetchLeaderboard(timeframe: TimeFilter): Promise<Agent[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/leaderboard?timeframe=${timeframe}&limit=10&sortBy=pnl`
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch leaderboard data');
+  }
+
+  const result = await response.json();
+
+  if (!result.success || !Array.isArray(result.data)) {
+    return [];
+  }
+
+  return result.data.map((agent: any) => ({
+    id: agent.id,
+    name: agent.name,
+    walletAddress: agent.walletAddress,
+    rank: agent.rank,
+    previousRank: agent.rank,
+    pnl: agent.pnl,
+    pnlPercent: agent.pnlPercent,
+    trades: agent.trades,
+    winRate: agent.winRate,
+    volume: agent.volume,
+    followers: agent.followers,
+    isVerified: agent.isVerified ?? false,
+    badges: [],
+    streak: 0,
+    bestTrade: 0,
+    worstTrade: 0,
+  }));
+}
 
 // ============================================================================
 // Helper Functions
@@ -424,7 +410,32 @@ function LiveActivityFeed() {
 
 export default function LeaderboardPage() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('daily');
-  const agents = LEADERBOARD_DATA[timeFilter];
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    fetchLeaderboard(timeFilter)
+      .then((data) => {
+        if (!cancelled) {
+          setAgents(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
+          setAgents([]);
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [timeFilter]);
 
   return (
     <main className="min-h-screen">
@@ -461,26 +472,56 @@ export default function LeaderboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-8">
-            {/* Stats Grid */}
-            <StatsGrid agents={agents} timeFilter={timeFilter} />
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-12 h-12 rounded-xl border-2 border-[var(--accent-cyan)] border-t-transparent animate-spin mb-4" />
+                <p className="text-[var(--text-secondary)]">Loading leaderboard data...</p>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-16 h-16 rounded-full bg-[var(--accent-red)]/10 flex items-center justify-center mb-4">
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <p className="text-[var(--text-secondary)] mb-2">Unable to load leaderboard</p>
+                <p className="text-sm text-[var(--text-tertiary)]">{error}</p>
+              </div>
+            ) : agents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-16 h-16 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center mb-4">
+                  <span className="text-2xl">🏆</span>
+                </div>
+                <p className="text-[var(--text-secondary)] mb-2">No agents ranked yet</p>
+                <p className="text-sm text-[var(--text-tertiary)]">Be the first to trade and claim the top spot!</p>
+                <Link href="/trade" className="mt-4 px-6 py-2 rounded-lg bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-cyan-dim)] text-[var(--bg-primary)] font-medium">
+                  Start Trading
+                </Link>
+              </div>
+            ) : (
+              <>
+                {/* Stats Grid */}
+                <StatsGrid agents={agents} timeFilter={timeFilter} />
 
-            {/* Podium */}
-            <div className="flex flex-col md:flex-row items-end justify-center gap-4 mb-8 opacity-0 animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
-              <PodiumCard agent={agents[1]} position={2} />
-              <PodiumCard agent={agents[0]} position={1} />
-              <PodiumCard agent={agents[2]} position={3} />
-            </div>
+                {/* Podium */}
+                {agents.length >= 3 && (
+                  <div className="flex flex-col md:flex-row items-end justify-center gap-4 mb-8 opacity-0 animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+                    <PodiumCard agent={agents[1]} position={2} />
+                    <PodiumCard agent={agents[0]} position={1} />
+                    <PodiumCard agent={agents[2]} position={3} />
+                  </div>
+                )}
 
-            {/* Full Leaderboard */}
-            <div className="space-y-3">
-              <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                <span className="w-1 h-5 rounded-full bg-[var(--accent-cyan)]" />
-                Full Rankings
-              </h2>
-              {agents.map((agent, idx) => (
-                <LeaderboardRow key={agent.id} agent={agent} index={idx} />
-              ))}
-            </div>
+                {/* Full Leaderboard */}
+                <div className="space-y-3">
+                  <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <span className="w-1 h-5 rounded-full bg-[var(--accent-cyan)]" />
+                    Full Rankings
+                  </h2>
+                  {agents.map((agent, idx) => (
+                    <LeaderboardRow key={agent.id} agent={agent} index={idx} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Sidebar */}
