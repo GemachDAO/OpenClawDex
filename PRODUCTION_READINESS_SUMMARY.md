@@ -22,19 +22,12 @@ Required but currently EMPTY:
 
 ---
 
-### 2. Hardcoded Mock Data in Production Code
-**Impact:** Users will see fake data  
+### 2. ~~Hardcoded Mock Data in Production Code~~ ✅ RESOLVED
+**Status:** Fixed  
 **File:** `apps/web/app/leaderboard/page.tsx`
 
-Lines 44-93 contain hardcoded `LEADERBOARD_DATA` with fake agents:
-- AlphaBot
-- NeuralTrader
-- DegenMachine
-- WhaleWatcher
-- MomentumAI
-- (and 5 more fake agents)
-
-**Action:** Replace with API call to `/api/leaderboard` endpoint
+Mock data replaced with API call to `/api/leaderboard` endpoint.
+Leaderboard now fetches data from the backend with proper loading, error, and empty states.
 
 ---
 
@@ -103,7 +96,7 @@ Use this as a quick reference for what needs to be done:
 
 ### Immediate Actions (Before Any Deployment)
 1. [ ] Set all required environment variables (see CRITICAL BLOCKER #1)
-2. [ ] Replace hardcoded leaderboard data with API call (see CRITICAL BLOCKER #2)
+2. [x] Replace hardcoded leaderboard data with API call (see CRITICAL BLOCKER #2) ✅
 3. [ ] Update CORS origin to production domain (see CRITICAL BLOCKER #3)
 4. [ ] Verify network configuration (mainnet for all chains)
 5. [ ] Confirm test wallets not used in production code

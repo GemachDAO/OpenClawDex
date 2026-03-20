@@ -554,9 +554,8 @@ export function createActionHandlers(
       showToast((params?.message as string) || '', (params?.variant as string) || 'info');
     },
 
-    setFilter: async (params: ActionParams) => {
-      // Handle filter updates - would update a filters state
-      console.log('Setting filter:', params);
+    setFilter: async (_params: ActionParams) => {
+      // Filter updates handled by component-level state
     },
   };
 }
